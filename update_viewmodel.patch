@@ -1,0 +1,32 @@
+--- app/src/main/java/com/example/ui/viewmodel/TicketAccountingViewModel.kt
++++ app/src/main/java/com/example/ui/viewmodel/TicketAccountingViewModel.kt
+@@ -151,12 +151,26 @@
+     private val _isDarkTheme = MutableStateFlow(false)
+     val isDarkTheme: StateFlow<Boolean> = _isDarkTheme.asStateFlow()
+ 
+-    private val _currentScreen = MutableStateFlow(AppScreen.DIRECT_SALES)
++    private val _currentScreen = MutableStateFlow(AppScreen.SPLASH)
+     val currentScreen: StateFlow<AppScreen> = _currentScreen.asStateFlow()
+ 
+     private val _customNightPrimary = MutableStateFlow<Color?>(null)
+     val customNightPrimary: StateFlow<Color?> = _customNightPrimary.asStateFlow()
+ 
++    private val sharedPreferences = application.getSharedPreferences("TicketAccountingPrefs", Context.MODE_PRIVATE)
++
++    fun onSplashFinished() {
++        val hasCompletedOnboarding = sharedPreferences.getBoolean("has_completed_onboarding", false)
++        if (hasCompletedOnboarding) {
++            _currentScreen.value = AppScreen.DIRECT_SALES
++        } else {
++            _currentScreen.value = AppScreen.ONBOARDING
++        }
++    }
++
++    fun finishOnboarding() {
++        sharedPreferences.edit().putBoolean("has_completed_onboarding", true).apply()
++        _currentScreen.value = AppScreen.DIRECT_SALES
++    }
++
+     private val _customDayPrimary = MutableStateFlow<Color?>(null)
+     val customDayPrimary: StateFlow<Color?> = _customDayPrimary.asStateFlow()
+ 

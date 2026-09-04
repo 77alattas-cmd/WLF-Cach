@@ -1,0 +1,6 @@
+{
+  "name": "WLF Cash",
+  "description": "تطبيق WLF Cash لإدارة ومحاسبة المبيعات وسندات الفئات والصندوق وتصفير الوردية والنسخ الاحتياطي والتقارير المالية الدقيقة",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
