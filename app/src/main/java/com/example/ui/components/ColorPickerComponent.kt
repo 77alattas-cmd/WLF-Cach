@@ -63,10 +63,11 @@ fun ColorWheelPicker(
         AndroidColor.colorToHSV(initialColor.toArgb(), hsv)
         mutableFloatStateOf(hsv[2].coerceIn(0f, 1f))
     }
+    var alpha by remember { mutableFloatStateOf(initialColor.alpha) }
 
-    val currentColor = remember(hue, saturation, brightness) {
+    val currentColor = remember(hue, saturation, brightness, alpha) {
         val hsv = floatArrayOf(hue, saturation, brightness)
-        Color(AndroidColor.HSVToColor(hsv))
+        Color(AndroidColor.HSVToColor(hsv)).copy(alpha = alpha)
     }
 
     LaunchedEffect(currentColor) {
@@ -256,6 +257,37 @@ fun ColorWheelPicker(
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.primary,
                     activeTrackColor = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Alpha / Transparency Slider
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "درجة الشفافية (Opacity):",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+                Text(
+                    text = "${(alpha * 100).toInt()}%",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Slider(
+                value = alpha,
+                onValueChange = { alpha = it },
+                valueRange = 0f..1f,
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.secondary,
+                    activeTrackColor = MaterialTheme.colorScheme.secondary
                 ),
                 modifier = Modifier.fillMaxWidth()
             )

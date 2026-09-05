@@ -168,6 +168,84 @@ val PRESET_APP_THEMES = listOf(
         previewGradient = listOf(0xFFFFEDD5, 0xFFC2410C),
         isNightMode = false,
         bgStyle = "METALLIC_COPPER"
+    ),
+    AppThemePreset(
+        name = "👑 سمة الذهب والسبائك الملكية الليلية",
+        description = "مظهر ليلي كربوني فخم بتطعيمات الذهب الخالص والأصفر الملكي البراق",
+        primaryColor = 0xFFF59E0B,
+        headerBgColor = 0xFF140F04,
+        headerTextColor = 0xFFFEF3C7,
+        borderColor = 0xFFD97706,
+        calculatorColor = 0xFFB45309,
+        activeTabColor = 0xFFF59E0B,
+        previewGradient = listOf(0xFF140F04, 0xFFF59E0B),
+        isNightMode = true,
+        bgStyle = "METALLIC_GOLD"
+    ),
+    AppThemePreset(
+        name = "🌌 سمة الفضاء السديمي والكون",
+        description = "مظهر كوني داكن بدرجات البنفسجي السديمي والنيلي المتوهج",
+        primaryColor = 0xFF8B5CF6,
+        headerBgColor = 0xFF0F0B1E,
+        headerTextColor = 0xFFEDE9FE,
+        borderColor = 0xFF7C3AED,
+        calculatorColor = 0xFF6D28D9,
+        activeTabColor = 0xFF8B5CF6,
+        previewGradient = listOf(0xFF0F0B1E, 0xFF8B5CF6),
+        isNightMode = true,
+        bgStyle = "TEXTURE_CARBON_FIBER"
+    ),
+    AppThemePreset(
+        name = "🌲 سمة الزمرد وغابات الليل",
+        description = "مظهر طبيعي داكن مستوحى من أشجار الغابات ليلاً بتوهج الزمرد الأخضر",
+        primaryColor = 0xFF059669,
+        headerBgColor = 0xFF04140D,
+        headerTextColor = 0xFFD1FAE5,
+        borderColor = 0xFF059669,
+        calculatorColor = 0xFF047857,
+        activeTabColor = 0xFF10B981,
+        previewGradient = listOf(0xFF04140D, 0xFF10B981),
+        isNightMode = true,
+        bgStyle = "TEXTURE_CARBON_FIBER"
+    ),
+    AppThemePreset(
+        name = "🌊 سمة أعماق الهاوية البحرية",
+        description = "مظهر ليلي داكن من خنادق المحيط بدرجات التيركواز والأزرق العميق",
+        primaryColor = 0xFF06B6D4,
+        headerBgColor = 0xFF031520,
+        headerTextColor = 0xFFCFFAFE,
+        borderColor = 0xFF0891B2,
+        calculatorColor = 0xFF0891B2,
+        activeTabColor = 0xFF06B6D4,
+        previewGradient = listOf(0xFF031520, 0xFF06B6D4),
+        isNightMode = true,
+        bgStyle = "METALLIC_TITANIUM"
+    ),
+    AppThemePreset(
+        name = "⚡ سمة الصاعقة الزرقاء الكهربائية",
+        description = "مظهر كحلي داكن وفخم بإشعاع أزرق كهربائي فوسفوري عالي التباين",
+        primaryColor = 0xFF3B82F6,
+        headerBgColor = 0xFF091224,
+        headerTextColor = 0xFFDBEAFE,
+        borderColor = 0xFF2563EB,
+        calculatorColor = 0xFF1D4ED8,
+        activeTabColor = 0xFF3B82F6,
+        previewGradient = listOf(0xFF091224, 0xFF3B82F6),
+        isNightMode = true,
+        bgStyle = "METALLIC_TITANIUM"
+    ),
+    AppThemePreset(
+        name = "🌹 سمة الياقوت والمخمل الأسود",
+        description = "مظهر مخملي أسود ملكي بلمسات الياقوت الأحمر القرمزي الداكن",
+        primaryColor = 0xFFE11D48,
+        headerBgColor = 0xFF1C060B,
+        headerTextColor = 0xFFFFE4E6,
+        borderColor = 0xFFBE123C,
+        calculatorColor = 0xFF9F1239,
+        activeTabColor = 0xFFE11D48,
+        previewGradient = listOf(0xFF1C060B, 0xFFE11D48),
+        isNightMode = true,
+        bgStyle = "TEXTURE_CARBON_FIBER"
     )
 )
 
@@ -202,11 +280,17 @@ data class DailyDirectSalesUiState(
     val use24HourFormat: Boolean = false, // نظام 24 ساعة اختياري (تلقائياً 12 ساعة)
     val isReadOnlyMode: Boolean = false, // وضع القراءة (قراءة فقط بدون تعديل)
     val isLockGivenExtraMode: Boolean = false, // وضع منع تعديل المعطى والإضافي
+    val isDayClosed: Boolean = false, // إغلاق اليوم الحسابي
+    val closedDayTimestamp: Long = 0L, // وقت إغلاق اليوم
+    val showCloseDayConfirmDialog: Boolean = false, // نافذة تأكيد إغلاق اليوم
+    val showUnlockDaySternWarningDialog: Boolean = false, // نافذة التحذير شديد اللهجة عند محاولة التعديل أو فك القفل
     val showDisableReadOnlyConfirmDialog: Boolean = false,
     val showDisableLockGivenExtraConfirmDialog: Boolean = false,
     val showCashRebalanceConfirmDialog: Boolean = false,
     val isSalesAccordionMode: Boolean = false, // عرض المبيعات كمطوية بدلاً من تبويبات
     val isCashBoxAccordionMode: Boolean = false, // عرض الصندوق كمطوية بدلاً من تبويبات
+    val isGridViewMode: Boolean = false, // عرض شبكي (Grid View) معطل افتراضياً
+    val appBackgroundImageUri: String? = null, // مسار صورة الخلفية المخصصة للمستخدم
     val includeInternetInReport: Boolean = false, // تضمين انترنت في التقرير
     val reportHeaderTitle: String = "البيان المالي",
     val reportHeaderSubtitle: String = "",
@@ -395,12 +479,15 @@ data class DailyDirectSalesUiState(
     val calculatorButtonColor: Long = 0xFF1E88E5,
     val calculatorBgColor: Long = 0xFF1E293B,
     val showRemainingStepper: Boolean = false, // زرّا زيادة (+1) وإنقاص (-1) للمتبقي
-    val isReviewMode: Boolean = false, // وضع المراجعة
     val showMaintenanceDialog: Boolean = false, // إظهار نافذة الصيانة
     val maintenanceResults: List<String> = emptyList(), // نتائج الصيانة والتصحيح التلقائي
     val isMaintenanceRunning: Boolean = false, // هل فحص الصيانة جاري حالياً؟
     val shiftReminderEnabled: Boolean = false, // تفعيل التنبيه اليومي لإغلاق الوردية
     val shiftReminderTime: String = "21:00", // وقت التنبيه اليومي
+    val isGridViewEnabled: Boolean = false, // عرض الشبكة (Grid View) معطل افتراضياً
+    val customBackgroundImageUri: String? = null, // صورة خلفية مخصصة من الجهاز
+    val customBackgroundOpacity: Float = 0.85f, // شفافية صورة الخلفية
+    val isGlobalAddedFieldActive: Boolean = false, // زر الإضافي في قسم المبيعات
     val customColorThemeState: CustomColorThemeState = CustomColorThemeState()
 ) {
     val selectedGroup: SalesGroupUiState?
@@ -446,6 +533,8 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         val initialShiftReminderTime = sharedPreferences.getString("shiftReminderTime", "21:00") ?: "21:00"
         val initialGridView = sharedPreferences.getBoolean("isGridViewMode", true)
         val initialCompact = sharedPreferences.getBoolean("showCompactMode", false)
+        val initialIsDayClosed = sharedPreferences.getBoolean("is_day_closed", false)
+        val initialClosedDayTs = sharedPreferences.getLong("closed_day_timestamp", 0L)
         
         val initialSymbolPos = sharedPreferences.getString("currency_symbol_position", "AUTO") ?: "AUTO"
         val initialDecimalMode = sharedPreferences.getString("currency_decimal_mode", "AUTO") ?: "AUTO"
@@ -467,6 +556,8 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                 shiftReminderEnabled = initialShiftReminder,
                 shiftReminderTime = initialShiftReminderTime,
                 showCompactMode = initialCompact,
+                isDayClosed = initialIsDayClosed,
+                closedDayTimestamp = initialClosedDayTs,
                 currencySymbolPosition = initialSymbolPos,
                 currencyDecimalMode = initialDecimalMode,
                 currencyThousandsSeparator = initialThousandsSep,
@@ -1166,6 +1257,20 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         saveToDatabase()
     }
 
+    fun toggleGroupMergeAdded(groupId: String) {
+        _uiState.update { state ->
+            val updated = state.groups.map { grp ->
+                if (grp.id == groupId) {
+                    val newValue = !grp.mergeAddedWithGiven
+                    sharedPreferences.edit().putBoolean("merge_added_${groupId}", newValue).apply()
+                    grp.copy(mergeAddedWithGiven = newValue)
+                } else grp
+            }
+            state.copy(groups = updated)
+        }
+        saveToDatabase()
+    }
+
     fun toggleRemainingStepper() {
         _uiState.update { state ->
             val newValue = !state.showRemainingStepper
@@ -1182,13 +1287,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     fun setShiftReminderTime(time: String) {
         sharedPreferences.edit().putString("shiftReminderTime", time).apply()
         _uiState.update { it.copy(shiftReminderTime = time) }
-    }
-
-    fun toggleReviewMode() {
-        _uiState.update { state ->
-            val newValue = !state.isReviewMode
-            state.copy(isReviewMode = newValue)
-        }
     }
 
     fun runMaintenanceDiagnostic() {
@@ -1386,7 +1484,99 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         saveToDatabase()
     }
 
+    fun toggleCashGroupAddToReport(groupId: String) {
+        _uiState.update { state ->
+            val updated = state.cashGroups.map { grp ->
+                if (grp.id == groupId) {
+                    val newVal = !grp.addToReport
+                    sharedPreferences.edit().putBoolean("cash_add_to_report_${groupId}", newVal).apply()
+                    grp.copy(addToReport = newVal)
+                } else grp
+            }
+            state.copy(cashGroups = updated)
+        }
+        addAuditLog("الإعدادات", "تضمين تقرير الصندوق", "تعديل تضمين مجموعة الصندوق في التقرير: $groupId", "", "")
+        saveToDatabase()
+    }
+
+    fun toggleCashGroupAddToBalance(groupId: String) {
+        _uiState.update { state ->
+            val updated = state.cashGroups.map { grp ->
+                if (grp.id == groupId) {
+                    val newVal = !grp.addToBalance
+                    sharedPreferences.edit().putBoolean("cash_add_to_balance_${groupId}", newVal).apply()
+                    grp.copy(addToBalance = newVal, isExcludedFromBalance = !newVal)
+                } else grp
+            }
+            state.copy(cashGroups = updated)
+        }
+        addAuditLog("الإعدادات", "تضمين موازنة الصندوق", "تعديل تضمين مجموعة الصندوق في الموازنة: $groupId", "", "")
+        saveToDatabase()
+    }
+
+    fun setGridViewEnabled(enabled: Boolean) {
+        _uiState.update { it.copy(isGridViewEnabled = enabled) }
+        sharedPreferences.edit().putBoolean("isGridViewEnabled", enabled).apply()
+        addAuditLog("التخطيط", "عرض الشبكة", if (enabled) "تفعيل" else "تعطيل", "", "")
+        saveToDatabase()
+    }
+
+    fun toggleGlobalAddedField() {
+        _uiState.update { state ->
+            val newVal = !state.isGlobalAddedFieldActive
+            sharedPreferences.edit().putBoolean("isGlobalAddedFieldActive", newVal).apply()
+            state.copy(isGlobalAddedFieldActive = newVal)
+        }
+    }
+
+    fun setCustomBackgroundImageUri(uri: String?) {
+        _uiState.update { it.copy(customBackgroundImageUri = uri, appBackgroundStyle = if (uri != null) "CUSTOM_IMAGE" else "DEFAULT") }
+        sharedPreferences.edit().putString("customBackgroundImageUri", uri).apply()
+        if (uri != null) {
+            setAppBackgroundStyle("CUSTOM_IMAGE")
+        }
+    }
+
+    fun setCustomBackgroundOpacity(opacity: Float) {
+        val clamped = opacity.coerceIn(0.1f, 1f)
+        _uiState.update { it.copy(customBackgroundOpacity = clamped) }
+        sharedPreferences.edit().putFloat("customBackgroundOpacity", clamped).apply()
+    }
+
+    fun setTableCardAlpha(alpha: Float) {
+        val clamped = alpha.coerceIn(0.1f, 1f)
+        _uiState.update { state ->
+            state.copy(customColorThemeState = state.customColorThemeState.copy(tableCardAlpha = clamped))
+        }
+        sharedPreferences.edit().putFloat("tableCardAlpha", clamped).apply()
+    }
+
+    fun setTableHeaderAlpha(alpha: Float) {
+        val clamped = alpha.coerceIn(0.1f, 1f)
+        _uiState.update { state ->
+            state.copy(customColorThemeState = state.customColorThemeState.copy(tableHeaderAlpha = clamped))
+        }
+        sharedPreferences.edit().putFloat("tableHeaderAlpha", clamped).apply()
+    }
+
+    fun setTableCellAlpha(alpha: Float) {
+        val clamped = alpha.coerceIn(0.1f, 1f)
+        _uiState.update { state ->
+            state.copy(customColorThemeState = state.customColorThemeState.copy(tableCellAlpha = clamped))
+        }
+        sharedPreferences.edit().putFloat("tableCellAlpha", clamped).apply()
+    }
+
+    fun setGroupCardAlpha(alpha: Float) {
+        val clamped = alpha.coerceIn(0.1f, 1f)
+        _uiState.update { state ->
+            state.copy(customColorThemeState = state.customColorThemeState.copy(groupCardAlpha = clamped))
+        }
+        sharedPreferences.edit().putFloat("groupCardAlpha", clamped).apply()
+    }
+
     fun updateCashInBoxYer(value: String) {
+        if (checkDayClosedAndWarn()) return
         val cleaned = value.filter { ch -> ch.isDigit() || ch == '.' }
         val oldVal = _uiState.value.cashInBoxYerInput
         _uiState.update { it.copy(cashInBoxYerInput = cleaned) }
@@ -1395,6 +1585,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun triggerCashConfirmDialog() {
+        if (checkDayClosedAndWarn()) return
         val state = _uiState.value
         val currentSummary = salesSummary.value
         val physical = state.cashInBoxYerInput.toDoubleOrNull() ?: 0.0
@@ -1431,6 +1622,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun updateCashInBoxSar(value: String) {
+        if (checkDayClosedAndWarn()) return
         val oldVal = _uiState.value.cashInBoxSarInput
         _uiState.update { it.copy(cashInBoxSarInput = value) }
         addAuditLog("الصندوق", "نقدي", "النقد بالريال السعودي", oldVal, value)
@@ -1438,6 +1630,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun updateExchangeRate(value: String) {
+        if (checkDayClosedAndWarn()) return
         val oldVal = _uiState.value.exchangeRateInput
         _uiState.update { it.copy(exchangeRateInput = value) }
         addAuditLog("الصندوق", "نقدي", "سعر الصرف", oldVal, value)
@@ -1471,19 +1664,83 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun toggleReadOnlyMode() {
-        if (_uiState.value.isReadOnlyMode) {
-            _uiState.update { it.copy(showDisableReadOnlyConfirmDialog = true) }
-        } else {
-            _uiState.update { it.copy(isReadOnlyMode = true) }
+        val newMode = !_uiState.value.isReadOnlyMode
+        _uiState.update {
+            it.copy(
+                isReadOnlyMode = newMode,
+                showDisableReadOnlyConfirmDialog = false
+            )
         }
+        addAuditLog("العرض", "وضع القراءة", if (newMode) "تفعيل وضع القراءة" else "إلغاء وضع القراءة", "", "")
     }
 
     fun confirmDisableReadOnlyMode() {
         _uiState.update { it.copy(isReadOnlyMode = false, showDisableReadOnlyConfirmDialog = false) }
+        addAuditLog("العرض", "وضع القراءة", "إلغاء وضع القراءة", "", "")
     }
 
     fun dismissDisableReadOnlyDialog() {
         _uiState.update { it.copy(showDisableReadOnlyConfirmDialog = false) }
+    }
+
+    fun requestCloseDay() {
+        if (_uiState.value.isDayClosed) {
+            _uiState.update { it.copy(showUnlockDaySternWarningDialog = true) }
+        } else {
+            _uiState.update { it.copy(showCloseDayConfirmDialog = true) }
+        }
+    }
+
+    fun confirmCloseDay() {
+        val now = System.currentTimeMillis()
+        _uiState.update {
+            it.copy(
+                isDayClosed = true,
+                closedDayTimestamp = now,
+                showCloseDayConfirmDialog = false
+            )
+        }
+        sharedPreferences.edit()
+            .putBoolean("is_day_closed", true)
+            .putLong("closed_day_timestamp", now)
+            .apply()
+        addAuditLog("إغلاق اليوم", "إغلاق اليوم", "تم اعتماد وإغلاق اليوم الحسابي وتجميد كافة الإدخالات", "", "")
+    }
+
+    fun dismissCloseDayDialog() {
+        _uiState.update { it.copy(showCloseDayConfirmDialog = false) }
+    }
+
+    fun onAttemptInputOnClosedDay() {
+        if (_uiState.value.isDayClosed) {
+            _uiState.update { it.copy(showUnlockDaySternWarningDialog = true) }
+        }
+    }
+
+    fun confirmUnlockDayWithSternWarning() {
+        _uiState.update {
+            it.copy(
+                isDayClosed = false,
+                showUnlockDaySternWarningDialog = false
+            )
+        }
+        sharedPreferences.edit()
+            .putBoolean("is_day_closed", false)
+            .putLong("closed_day_timestamp", 0L)
+            .apply()
+        addAuditLog("تحذير أمني شديد", "فك إغلاق اليوم", "قام المستخدم بفك إغلاق اليوم بعد تأكيد التحذير شديد اللهجة وتحمل كامل المسؤولية", "", "")
+    }
+
+    fun dismissUnlockDaySternWarningDialog() {
+        _uiState.update { it.copy(showUnlockDaySternWarningDialog = false) }
+    }
+
+    fun checkDayClosedAndWarn(): Boolean {
+        if (_uiState.value.isDayClosed) {
+            _uiState.update { it.copy(showUnlockDaySternWarningDialog = true) }
+            return true
+        }
+        return false
     }
 
     fun toggleLockGivenExtraMode() {
@@ -1920,6 +2177,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
 
     // Update Given without popup prompt
     fun updateGiven(groupId: String, denomination: Int, given: String, skipConfirm: Boolean = true) {
+        if (checkDayClosedAndWarn()) return
         if (_uiState.value.isLockGivenExtraMode) return
         val group = _uiState.value.groups.find { it.id == groupId } ?: return
         val row = group.rows.find { it.denomination == denomination } ?: return
@@ -1961,16 +2219,29 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun updateAdded(groupId: String, denomination: Int, added: String) {
+        if (checkDayClosedAndWarn()) return
         if (_uiState.value.isLockGivenExtraMode) return
         val group = _uiState.value.groups.find { it.id == groupId } ?: return
         val row = group.rows.find { it.denomination == denomination } ?: return
         val oldAdded = row.addedInput
+        val oldAddedVal = oldAdded.trim().toIntOrNull() ?: 0
+        val newAddedVal = added.trim().toIntOrNull() ?: 0
+        val diff = newAddedVal - oldAddedVal
 
         _uiState.update { state ->
             val updatedGroups = state.groups.map { grp ->
                 if (grp.id == groupId) {
                     val updatedRows = grp.rows.map { r ->
-                        if (r.denomination == denomination) r.copy(addedInput = added) else r
+                        if (r.denomination == denomination) {
+                            val newRemainingInput = if (r.remainingInput.isNotBlank()) {
+                                val curRem = r.remainingInput.trim().toIntOrNull() ?: 0
+                                val adjustedRem = (curRem + diff).coerceAtLeast(0)
+                                adjustedRem.toString()
+                            } else {
+                                r.remainingInput
+                            }
+                            r.copy(addedInput = added, remainingInput = newRemainingInput)
+                        } else r
                     }
                     grp.copy(rows = updatedRows)
                 } else grp
@@ -1981,8 +2252,39 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         saveToDatabase()
     }
 
+    fun commitSalesFromCalculator(
+        groupId: String,
+        targetField: com.example.ui.components.CalculatorTargetField,
+        quantities: Map<Int, Int>
+    ) {
+        if (checkDayClosedAndWarn()) return
+        val group = _uiState.value.groups.find { it.id == groupId } ?: return
+        _uiState.update { state ->
+            val updatedGroups = state.groups.map { grp ->
+                if (grp.id == groupId) {
+                    val updatedRows = grp.rows.map { r ->
+                        val qty = quantities[r.denomination]
+                        if (qty != null) {
+                            val strVal = if (qty > 0) qty.toString() else ""
+                            when (targetField) {
+                                com.example.ui.components.CalculatorTargetField.GIVEN -> r.copy(givenInput = strVal)
+                                com.example.ui.components.CalculatorTargetField.ADDED -> r.copy(addedInput = strVal)
+                                com.example.ui.components.CalculatorTargetField.REMAINING -> r.copy(remainingInput = strVal)
+                            }
+                        } else r
+                    }
+                    grp.copy(rows = updatedRows)
+                } else grp
+            }
+            state.copy(groups = updatedGroups)
+        }
+        addAuditLog("المبيعات", group.name, "اعتماد إدخال من الآلة الحاسبة (${targetField.label})", "", "")
+        saveToDatabase()
+    }
+
     // Update Remaining with smooth, non-blocking entry & strict validation against given+added
     fun updateRemaining(groupId: String, denomination: Int, remaining: String) {
+        if (checkDayClosedAndWarn()) return
         val group = _uiState.value.groups.find { it.id == groupId } ?: return
         val row = group.rows.find { it.denomination == denomination } ?: return
         val oldRemaining = row.remainingInput
@@ -3993,6 +4295,20 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         _uiState.update { it.copy(isCashBoxAccordionMode = enabled) }
         sharedPreferences.edit().putBoolean("isCashBoxAccordionMode", enabled).apply()
         addAuditLog("العرض", "مطوية الصندوق", if (enabled) "تفعيل وضع المطوية للصندوق" else "تفعيل وضع التبويبات للصندوق", "", "")
+        saveToDatabase()
+    }
+
+    fun toggleGridViewMode(enabled: Boolean) {
+        _uiState.update { it.copy(isGridViewMode = enabled) }
+        sharedPreferences.edit().putBoolean("isGridViewMode", enabled).apply()
+        addAuditLog("التخطيط", "العرض الشبكي", if (enabled) "تفعيل العرض الشبكي" else "تعطيل العرض الشبكي", "", "")
+        saveToDatabase()
+    }
+
+    fun setAppBackgroundImageUri(uri: String?) {
+        _uiState.update { it.copy(appBackgroundImageUri = uri, appBackgroundStyle = if (uri != null) "CUSTOM_IMAGE" else it.appBackgroundStyle) }
+        sharedPreferences.edit().putString("appBackgroundImageUri", uri ?: "").apply()
+        sharedPreferences.edit().putString("appBackgroundStyle", if (uri != null) "CUSTOM_IMAGE" else _uiState.value.appBackgroundStyle).apply()
         saveToDatabase()
     }
 

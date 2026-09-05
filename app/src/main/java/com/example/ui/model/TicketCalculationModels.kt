@@ -154,7 +154,8 @@ data class DirectSalesRowUiState(
     val notes: String = "",
     val customTitle: String = "",
     val isEnabled: Boolean = true,
-    val formula: CalculationFormula = CalculationFormula.TICKET_STANDARD
+    val formula: CalculationFormula = CalculationFormula.TICKET_STANDARD,
+    val mergeAddedWithGiven: Boolean = false
 ) {
     val given: Int
         get() = givenInput.trim().toIntOrNull() ?: 0
@@ -168,8 +169,12 @@ data class DirectSalesRowUiState(
     // حساب المباع بناءً على المعادلة المحددة
     val sold: Int
         get() = when (formula) {
-            CalculationFormula.TICKET_STANDARD -> (given + added) - remaining
-            CalculationFormula.GIVEN_MINUS_REMAINING -> given - remaining
+            CalculationFormula.TICKET_STANDARD -> {
+                val totalGiven = given + added
+                // احتساب المعطى والإضافي معاً في حالة وجود إضافي
+                (totalGiven - remaining).coerceAtLeast(0)
+            }
+            CalculationFormula.GIVEN_MINUS_REMAINING -> ((given + added) - remaining).coerceAtLeast(0)
             CalculationFormula.SUM_DIRECT -> given + added
             CalculationFormula.QUANTITY_PRICE -> given
             CalculationFormula.PERCENTAGE_COMMISSION -> given
@@ -185,9 +190,11 @@ data class DirectSalesRowUiState(
             CalculationFormula.PERCENTAGE_COMMISSION -> (given * (denomination / 100.0))
         }
 
-    // التحقق من صحة المدخلات (المتبقي لا يتجاوز المعطى + الإضافي في نمط التذاكر)
+    // التحقق من صحة المدخلات (المتبقي لا يتجاوز المعطى + الإضافي)
     val isRemainingExceeded: Boolean
-        get() = if (formula == CalculationFormula.TICKET_STANDARD) remaining > (given + added) else false
+        get() = if (formula == CalculationFormula.TICKET_STANDARD || formula == CalculationFormula.GIVEN_MINUS_REMAINING) {
+            remaining > (given + added)
+        } else false
 
     val isFilled: Boolean
         get() = givenInput.isNotBlank() || addedInput.isNotBlank() || remainingInput.isNotBlank()
@@ -444,6 +451,8 @@ data class CashBoxGroupUiState(
     val orderIndex: Int = 0,
     val isDefault: Boolean = false,
     val isExcludedFromBalance: Boolean = false,
+    val addToReport: Boolean = true, // إضافة للتقرير
+    val addToBalance: Boolean = !isExcludedFromBalance, // إضافة للرصيد والموازنة
     val notes: String = "",
     val denomRows: List<CashDenomRowUiState> = DEFAULT_CASH_DENOMINATIONS.map { CashDenomRowUiState(denomination = it) },
     val directEntries: List<CashDirectEntryItem> = emptyList()

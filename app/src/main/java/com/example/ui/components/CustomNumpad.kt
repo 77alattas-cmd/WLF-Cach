@@ -568,12 +568,12 @@ fun GlobalCustomNumpad() {
 
                         // 3. NUMPAD DIGIT & ACTION KEYS MATRIX (4 Rows)
                         val rows = if (controller.allowPlusMinus) listOf(
-                            listOf("7", "8", "9", "⌫"),
+                            listOf("7", "8", "9", "مسح"),
                             listOf("4", "5", "6", "C"),
                             listOf("1", "2", "3", "+"),
                             listOf("0", "-", "✓")
                         ) else listOf(
-                            listOf("7", "8", "9", "⌫"),
+                            listOf("7", "8", "9", "مسح"),
                             listOf("4", "5", "6", "C"),
                             listOf("1", "2", "3", "00"),
                             listOf("0", "000", "✓")
@@ -586,7 +586,7 @@ fun GlobalCustomNumpad() {
                             ) {
                                 keyRow.forEach { key ->
                                     val isDone = key == "✓"
-                                    val isBackspace = key == "⌫"
+                                    val isBackspace = key == "مسح" || key == "⌫"
                                     val isClear = key == "C"
                                     val isAction = isDone || isBackspace || isClear
                                     val weight = if (isDone) 2f else 1f
@@ -606,7 +606,7 @@ fun GlobalCustomNumpad() {
                                                     controller.onDone?.invoke()
                                                     controller.hide()
                                                 }
-                                                "⌫" -> {
+                                                "مسح", "⌫" -> {
                                                     controller.shouldReplaceOnFirstDigit = false
                                                     if (controller.value.isNotEmpty()) {
                                                         controller.value = controller.value.dropLast(1)
@@ -691,8 +691,8 @@ fun GlobalCustomNumpad() {
                                                     Text("تم", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                                 }
                                             }
-                                            "⌫" -> Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "مسح رقم", modifier = Modifier.size(20.dp))
-                                            "C" -> Text("مسح C", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
+                                            "مسح", "⌫" -> Text("مسح", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                            "C" -> Text("تصفير", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
                                             else -> Text(text = key, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                         }
                                     }

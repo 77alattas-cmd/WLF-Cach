@@ -3,6 +3,7 @@ package com.example.ui.screens
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,9 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.ui.viewmodel.TicketAccountingViewModel
 import kotlinx.coroutines.delay
 
@@ -60,21 +63,11 @@ fun SplashScreen(viewModel: TicketAccountingViewModel) {
                 .scale(scale.value)
                 .padding(24.dp)
         ) {
-            Surface(
-                shape = CircleShape,
-                color = splashCardBg,
-                border = BorderStroke(1.5.dp, Color(0xFF4B5563)),
-                modifier = Modifier.size(110.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.AccountBalanceWallet,
-                        contentDescription = null,
-                        tint = accentIconColor,
-                        modifier = Modifier.size(56.dp)
-                    )
-                }
-            }
+            Image(
+                painter = painterResource(id = R.drawable.ic_app_icon_main),
+                contentDescription = "شعار WLF Cash",
+                modifier = Modifier.size(130.dp)
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 

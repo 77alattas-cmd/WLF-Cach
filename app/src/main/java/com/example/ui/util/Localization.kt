@@ -31,6 +31,9 @@ object AppStrings {
             "light_mode" -> "الوضع النهاري"
             "lock_given_extra" -> "منع تعديل المعطى والإضافي"
             "read_only_mode" -> "وضع القراءة"
+            "close_day" -> "إغلاق اليوم"
+            "day_closed" -> "اليوم مغلق"
+            "unlock_day" -> "فك إغلاق اليوم"
 
             // Common Terms
             "total_sales" -> "إجمالي المبيعات"

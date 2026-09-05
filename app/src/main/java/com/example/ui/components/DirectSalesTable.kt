@@ -45,6 +45,7 @@ fun DirectSalesTable(
     showRemainingStepper: Boolean = false,
     customColorState: CustomColorThemeState = CustomColorThemeState(),
     onToggleEnabled: (() -> Unit)? = null,
+    onToggleMergeAdded: ((Boolean) -> Unit)? = null,
     onGivenChange: (Int, String) -> Unit,
     onAddedChange: (Int, String) -> Unit,
     onRemainingChange: (Int, String) -> Unit,
@@ -59,6 +60,7 @@ fun DirectSalesTable(
     val effectiveAddedEnabled = isAddedFieldEnabled && !mergeAddedWithGiven
     val totalRevenue = if (isEnabled) rows.sumOf { it.total } else 0.0
     val tableCardBg = customColorState.getColorOrNull(customColorState.tableCardBg) ?: MaterialTheme.colorScheme.surface
+    val tableHeaderBg = customColorState.getColorOrNull(customColorState.tableHeaderBg) ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
     val tableBorder = customColorState.getColorOrNull(customColorState.tableBorderColor) ?: MaterialTheme.colorScheme.outlineVariant
     val numpad = LocalNumpadController.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -217,13 +219,16 @@ fun DirectSalesTable(
         )
     }
 
+    val effectiveTableCardBg = customColorState.getEffectiveTableCardBg(tableCardBg)
+    val effectiveTableHeaderBg = customColorState.getEffectiveTableHeaderBg(tableHeaderBg)
+
     Column(modifier = modifier.fillMaxWidth()) {
         // Table Container Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(18.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (isEnabled) tableCardBg else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                containerColor = if (isEnabled) effectiveTableCardBg else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
             ),
             border = BorderStroke(
                 1.dp,
@@ -306,6 +311,47 @@ fun DirectSalesTable(
                     }
                 }
 
+                if (isAddedFieldEnabled) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = mergeAddedWithGiven,
+                                    onCheckedChange = { onToggleMergeAdded?.invoke(it) },
+                                    modifier = Modifier.size(24.dp).testTag("checkbox_merge_added_${groupName}")
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "دمج الإضافي مع المعطى (إضافة بدون حساب تلقائي كمباع)",
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.Default.MergeType,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 val headerTextColor = customColorState.getColorOrNull(customColorState.tableHeaderText) ?: MaterialTheme.colorScheme.onSurfaceVariant
@@ -313,7 +359,7 @@ fun DirectSalesTable(
                 // Table Column Headers
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                    color = effectiveTableHeaderBg,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -376,6 +422,7 @@ fun DirectSalesTable(
                         isRowFocused = isRowActive,
                         focusedCellType = if (isRowActive) activeFocusCellType else null,
                         canDelete = !DEFAULT_TICKET_CATEGORIES.contains(rowState.denomination),
+                        customColorState = customColorState,
                         showRemainingStepper = showRemainingStepper,
                         onRemainingChange = onRemainingChange,
                         onOpenGiven = { openCell(index, SalesCellType.GIVEN) },
@@ -423,6 +470,7 @@ fun InteractiveSalesRow(
     onZeroOut: () -> Unit,
     onToggleRowEnabled: () -> Unit,
     onDelete: () -> Unit,
+    customColorState: CustomColorThemeState = CustomColorThemeState(),
     modifier: Modifier = Modifier
 ) {
     val isCompact = com.example.ui.LocalCompactMode.current
@@ -440,11 +488,13 @@ fun InteractiveSalesRow(
         }
     }
 
+    val cellEffectiveBg = customColorState.getEffectiveTableCellBg(MaterialTheme.colorScheme.surface)
+
     Surface(
         shape = RoundedCornerShape(if (isCompact) 8.dp else 12.dp),
         color = when {
             isRowFocused -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-            isEnabled -> MaterialTheme.colorScheme.surface
+            isEnabled -> cellEffectiveBg
             else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
         },
         border = BorderStroke(

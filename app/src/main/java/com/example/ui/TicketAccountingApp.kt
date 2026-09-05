@@ -8,9 +8,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,7 +35,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +48,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
+import com.example.R
 import com.example.ui.components.GlobalCustomNumpad
 import com.example.ui.components.LocalNumpadController
 import com.example.ui.components.NumpadController
@@ -342,20 +349,11 @@ fun TicketAccountingApp(
                                         horizontalArrangement = Arrangement.Start,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Surface(
-                                            shape = MaterialTheme.shapes.small,
-                                            color = MaterialTheme.colorScheme.primaryContainer,
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_app_icon_main),
+                                            contentDescription = "WLF Cash",
                                             modifier = Modifier.size(32.dp)
-                                        ) {
-                                            Box(contentAlignment = Alignment.Center) {
-                                                Icon(
-                                                    imageVector = Icons.Default.ConfirmationNumber,
-                                                    contentDescription = null,
-                                                    tint = MaterialTheme.colorScheme.primary,
-                                                    modifier = Modifier.size(18.dp)
-                                                )
-                                            }
-                                        }
+                                        )
                                         Spacer(modifier = Modifier.width(10.dp))
                                         Text(
                                             text = "WLF Cash",
@@ -455,16 +453,46 @@ fun TicketAccountingApp(
                                         )
                                     }
 
-                                    // Review Mode Toggle Button
-                                    IconButton(
-                                        onClick = { viewModel.toggleReviewMode() },
-                                        modifier = Modifier.testTag("top_bar_review_toggle")
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.FactCheck,
-                                            contentDescription = "وضع المراجعة",
-                                            tint = if (uiState.isReviewMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
+                                    // Close Day Button / Day Closed Indicator (زر إغلاق اليوم / حالة إغلاق اليوم)
+                                    if (uiState.isDayClosed) {
+                                        Surface(
+                                            shape = RoundedCornerShape(20.dp),
+                                            color = MaterialTheme.colorScheme.errorContainer,
+                                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                                            modifier = Modifier
+                                                .padding(horizontal = 4.dp)
+                                                .clickable { viewModel.requestCloseDay() }
+                                                .testTag("top_bar_day_closed_badge")
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Lock,
+                                                    contentDescription = "اليوم مغلق",
+                                                    tint = MaterialTheme.colorScheme.error,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    text = "اليوم مغلق",
+                                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        IconButton(
+                                            onClick = { viewModel.requestCloseDay() },
+                                            modifier = Modifier.testTag("top_bar_close_day_button")
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.LockClock,
+                                                contentDescription = AppStrings.get("close_day", lang),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
                                     }
                                 },
                                 colors = TopAppBarDefaults.topAppBarColors(
@@ -699,43 +727,200 @@ fun TicketAccountingApp(
                                 label = "screen_transition",
                                 modifier = Modifier.fillMaxSize()
                             ) { screen ->
-                                if (uiState.isReviewMode) {
-                                    ReviewModeScreen(viewModel = viewModel)
-                                } else {
-                                    when (screen) {
-                                        AppScreen.SPLASH -> {
-                                            SplashScreen(viewModel = viewModel)
-                                        }
-                                        AppScreen.ONBOARDING -> {
-                                            OnboardingScreen(viewModel = viewModel)
-                                        }
-                                        AppScreen.DIRECT_SALES -> {
-                                            DirectSalesScreen(viewModel = viewModel)
-                                        }
-                                        AppScreen.CASH_BOX -> {
-                                            CashBoxScreen(viewModel = viewModel)
-                                        }
-                                        AppScreen.REPORTS -> {
-                                            ReportsScreen(viewModel = viewModel)
-                                        }
-                                        AppScreen.MANAGEMENT -> {
-                                            ManagementScreen(viewModel = viewModel)
-                                        }
-                                        AppScreen.SETTINGS -> {
-                                            SettingsScreen(viewModel = viewModel)
-                                        }
-                                        else -> {
-                                            DirectSalesScreen(viewModel = viewModel)
-                                        }
+                                when (screen) {
+                                    AppScreen.SPLASH -> {
+                                        SplashScreen(viewModel = viewModel)
+                                    }
+                                    AppScreen.ONBOARDING -> {
+                                        OnboardingScreen(viewModel = viewModel)
+                                    }
+                                    AppScreen.DIRECT_SALES -> {
+                                        DirectSalesScreen(viewModel = viewModel)
+                                    }
+                                    AppScreen.CASH_BOX -> {
+                                        CashBoxScreen(viewModel = viewModel)
+                                    }
+                                    AppScreen.REPORTS -> {
+                                        ReportsScreen(viewModel = viewModel)
+                                    }
+                                    AppScreen.MANAGEMENT -> {
+                                        ManagementScreen(viewModel = viewModel)
+                                    }
+                                    AppScreen.SETTINGS -> {
+                                        SettingsScreen(viewModel = viewModel)
+                                    }
+                                    else -> {
+                                        DirectSalesScreen(viewModel = viewModel)
                                     }
                                 }
                             }
                         }
 
-
-
                         // Global Numpad overlay
                         GlobalCustomNumpad()
+
+                        // Dialog: Confirm Closing the Day (حوار تأكيد إغلاق اليوم)
+                        if (uiState.showCloseDayConfirmDialog) {
+                            AlertDialog(
+                                onDismissRequest = { viewModel.dismissCloseDayDialog() },
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.LockClock,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+                                },
+                                title = {
+                                    Text(
+                                        text = "تأكيد إغلاق واعتماد اليوم الحسابي",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                        textAlign = TextAlign.Center
+                                    )
+                                },
+                                text = {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Text(
+                                            text = "هل أنت متأكد من رغبتك في إغلاق اليوم الحسابي الحالي واعتماده؟",
+                                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                        )
+                                        Card(
+                                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                                Text(
+                                                    text = "• سيتم تجميد كافة الجداول، الفئات، والصناديق النقدية.",
+                                                    style = MaterialTheme.typography.bodySmall
+                                                )
+                                                Text(
+                                                    text = "• لن يُقبل أي إدخال أو تعديل لهذا اليوم إلا بعد تحذير أمني شديد اللهجة وتحمل كامل المسؤولية.",
+                                                    style = MaterialTheme.typography.bodySmall
+                                                )
+                                                Text(
+                                                    text = "• يظل بإمكانك معاينة البيان المالي وطباعة وتصدير التقارير.",
+                                                    style = MaterialTheme.typography.bodySmall
+                                                )
+                                            }
+                                        }
+                                    }
+                                },
+                                confirmButton = {
+                                    Button(
+                                        onClick = { viewModel.confirmCloseDay() },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    ) {
+                                        Text("تأكيد إغلاق اليوم الآن 🔒", fontWeight = FontWeight.Bold)
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(
+                                        onClick = { viewModel.dismissCloseDayDialog() }
+                                    ) {
+                                        Text("تراجع")
+                                    }
+                                }
+                            )
+                        }
+
+                        // Dialog: Stern Warning When Attempting Input or Unlocking Closed Day (تحذير شديد اللهجة للمستخدم)
+                        if (uiState.showUnlockDaySternWarningDialog) {
+                            AlertDialog(
+                                onDismissRequest = { viewModel.dismissUnlockDaySternWarningDialog() },
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.WarningAmber,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.size(48.dp)
+                                    )
+                                },
+                                title = {
+                                    Text(
+                                        text = "⚠️ تحذير أمني شديد اللهجة: اليوم مغلق ومُعتمد!",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = MaterialTheme.colorScheme.error
+                                        ),
+                                        textAlign = TextAlign.Center
+                                    )
+                                },
+                                text = {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .verticalScroll(rememberScrollState()),
+                                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        Text(
+                                            text = "⚠️ تنبيه محاسبي ورقابي بالغ الأهمية وعالي الخطورة:",
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            text = "هذا اليوم الحسابي قد تم إغلاقه واعتماده رسمياً وحساب إيراداته وأرصدته ومطابقة صناديقه النقدية.",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Card(
+                                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f)),
+                                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.6f)),
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                                                Text(
+                                                    text = "⛔ لا يقبل النظام أي إدخال أو تعديل في الأرقام أو الفئات لهذا اليوم المغلق.",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                                )
+                                                Text(
+                                                    text = "• أي تعديل بالأرقام سيكسر سلامة السجلات والمطابقة المحاسبية المعتمدة.",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                                Text(
+                                                    text = "• قد يتسبب ذلك في حدوث عجز أو فروقات نقدية غير مبررة في قيود الصندوق.",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                                Text(
+                                                    text = "• سيتم تسجيل محاولة وتأكيد هذا الإجراء في سجل الرقابة والتدقيق (Audit Log) كإجراء استثنائي عالي الخطورة.",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                            }
+                                        }
+                                        Text(
+                                            text = "هل أنت متأكد تماماً وعلى مسؤوليتك الإدارية الكاملة من رغبتك في فك قفل هذا اليوم والسماح بالتعديل؟",
+                                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                                        )
+                                    }
+                                },
+                                confirmButton = {
+                                    Button(
+                                        onClick = { viewModel.confirmUnlockDayWithSternWarning() },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.error,
+                                            contentColor = MaterialTheme.colorScheme.onError
+                                        )
+                                    ) {
+                                        Text("أتحمل المسؤولية وفك القفل ⚠️", fontWeight = FontWeight.Bold)
+                                    }
+                                },
+                                dismissButton = {
+                                    OutlinedButton(
+                                        onClick = { viewModel.dismissUnlockDaySternWarningDialog() }
+                                    ) {
+                                        Text("تراجع (إبقاء اليوم مغلقاً)")
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             )

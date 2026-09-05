@@ -3,8 +3,10 @@ package com.example.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -59,6 +61,7 @@ fun DirectSalesScreen(
     var showAddSalesGroupDialog by remember { mutableStateOf(false) }
     var showResetAllConfirmDialog by remember { mutableStateOf(false) }
     var isGroupTabsReorderEnabled by remember { mutableStateOf(false) }
+    var showCategoryCalculatorDialog by remember { mutableStateOf(false) }
 
     // Auto-scroll when selected group changes in Tab mode
     LaunchedEffect(uiState.selectedGroupId) {
@@ -241,8 +244,58 @@ fun DirectSalesScreen(
             }
         }
 
+        // 1.4 Day Closed Banner (إغلاق اليوم)
+        if (uiState.isDayClosed) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.errorContainer,
+                border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.error)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "🔒 اليوم مغلق ومُعتمد رسمياً",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        )
+                        Text(
+                            text = "توقف الإدخال والتعديل لهذا اليوم نهائياً لحماية الحسابات.",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.9f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Button(
+                        onClick = { viewModel.requestCloseDay() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        ),
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text("فك القفل ⚠️", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold))
+                    }
+                }
+            }
+        }
+
         // 1.5 Read-Only & Lock Mode Banners
-        if (uiState.isReadOnlyMode) {
+        if (uiState.isReadOnlyMode && !uiState.isDayClosed) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -329,14 +382,63 @@ fun DirectSalesScreen(
             }
         }
 
-        // 2.5 Toolbar: Accordion Mode and Auto-Scroll Toggle
+        // 2.5 Toolbar: Controls, Added Toggle, Calculator, Accordion, and Reorder
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 2.dp),
+                .padding(horizontal = 10.dp, vertical = 2.dp)
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // زر الإضافي (يظهر مربع دمج الإضافي في رأس كل مجموعة)
+            FilledTonalButton(
+                onClick = { viewModel.toggleGlobalAddedField() },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = if (uiState.isGlobalAddedFieldActive) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (uiState.isGlobalAddedFieldActive) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.height(30.dp).testTag("btn_toggle_global_added")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AddCircleOutline,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = if (uiState.isGlobalAddedFieldActive) "الإضافي ✓" else "الإضافي",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            // زر آلة حاسبة الفئات المتطورة مع لوحة أرقام وشاشة تأكيد
+            FilledTonalButton(
+                onClick = { showCategoryCalculatorDialog = true },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.height(30.dp).testTag("btn_open_category_calculator")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Calculate,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "آلة حاسبة",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
             FilledTonalButton(
                 onClick = { viewModel.toggleSalesAccordionMode(!uiState.isSalesAccordionMode) },
                 shape = RoundedCornerShape(8.dp),
@@ -564,10 +666,11 @@ fun DirectSalesScreen(
                                                 DirectSalesTable(
                                                     rows = group.activeRows.ifEmpty { group.rows },
                                                     groupName = group.name,
-                                                    isEnabled = group.isEnabled && !uiState.isReadOnlyMode,
+                                                    isEnabled = group.isEnabled && !uiState.isReadOnlyMode && !uiState.isDayClosed,
                                                     isLockGivenExtraMode = uiState.isLockGivenExtraMode,
-                                                    isAddedFieldEnabled = group.isAddedFieldEnabled,
+                                                    isAddedFieldEnabled = uiState.isGlobalAddedFieldActive || group.isAddedFieldEnabled,
                                                     mergeAddedWithGiven = group.mergeAddedWithGiven,
+                                                    onToggleMergeAdded = { viewModel.toggleGroupMergeAdded(group.id) },
                                                     showRemainingStepper = uiState.showRemainingStepper,
                                                     customColorState = uiState.customColorThemeState,
                                                     onGivenChange = { denom, givenStr -> viewModel.updateGiven(group.id, denom, givenStr) },
@@ -585,7 +688,7 @@ fun DirectSalesScreen(
                                                 DirectEntryGroupTable(
                                                     group = group,
                                                     customColorState = uiState.customColorThemeState,
-                                                    isReadOnlyMode = uiState.isReadOnlyMode,
+                                                    isReadOnlyMode = uiState.isReadOnlyMode || uiState.isDayClosed,
                                                     onAddEntry = { title, amount, qty, notes -> viewModel.addDirectEntry(group.id, title, amount, notes) },
                                                     onAddDeposit = { title, amount, notes -> viewModel.addChiniDepositEntry(group.id, title, amount, notes) },
                                                     onUpdateEntry = { id, title, amount, qty, notes -> viewModel.updateDirectEntry(group.id, id, title, amount, notes) },
@@ -653,10 +756,11 @@ fun DirectSalesScreen(
                                 DirectSalesTable(
                                     rows = currentSelectedGroup.activeRows.ifEmpty { currentSelectedGroup.rows },
                                     groupName = currentSelectedGroup.name,
-                                    isEnabled = currentSelectedGroup.isEnabled && !uiState.isReadOnlyMode,
+                                    isEnabled = currentSelectedGroup.isEnabled && !uiState.isReadOnlyMode && !uiState.isDayClosed,
                                     isLockGivenExtraMode = uiState.isLockGivenExtraMode,
-                                    isAddedFieldEnabled = currentSelectedGroup.isAddedFieldEnabled,
+                                    isAddedFieldEnabled = uiState.isGlobalAddedFieldActive || currentSelectedGroup.isAddedFieldEnabled,
                                     mergeAddedWithGiven = currentSelectedGroup.mergeAddedWithGiven,
+                                    onToggleMergeAdded = { viewModel.toggleGroupMergeAdded(currentSelectedGroup.id) },
                                     showRemainingStepper = uiState.showRemainingStepper,
                                     customColorState = uiState.customColorThemeState,
                                     onGivenChange = { denom, givenStr -> viewModel.updateGiven(currentSelectedGroup.id, denom, givenStr) },
@@ -674,7 +778,7 @@ fun DirectSalesScreen(
                                 DirectEntryGroupTable(
                                     group = currentSelectedGroup,
                                     customColorState = uiState.customColorThemeState,
-                                    isReadOnlyMode = uiState.isReadOnlyMode,
+                                    isReadOnlyMode = uiState.isReadOnlyMode || uiState.isDayClosed,
                                     onAddEntry = { title, amount, qty, notes -> viewModel.addDirectEntry(currentSelectedGroup.id, title, amount, notes) },
                                     onAddDeposit = { title, amount, notes -> viewModel.addChiniDepositEntry(currentSelectedGroup.id, title, amount, notes) },
                                     onUpdateEntry = { id, title, amount, qty, notes -> viewModel.updateDirectEntry(currentSelectedGroup.id, id, title, amount, notes) },
@@ -875,6 +979,17 @@ fun DirectSalesScreen(
             allSalesGroups = uiState.groups,
             allCashGroups = uiState.cashGroups,
             isSalesSection = true
+        )
+    }
+
+    if (showCategoryCalculatorDialog) {
+        com.example.ui.components.SalesCategoryCalculatorDialog(
+            groups = activeGroups,
+            initialGroupId = uiState.selectedGroupId,
+            onDismiss = { showCategoryCalculatorDialog = false },
+            onCommitSales = { grpId, targetField, quantities ->
+                viewModel.commitSalesFromCalculator(grpId, targetField, quantities)
+            }
         )
     }
 }

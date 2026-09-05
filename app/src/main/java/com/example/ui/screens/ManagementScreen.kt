@@ -1155,6 +1155,95 @@ fun ManagementScreen(
                     }
                 }
 
+                // 2.5 Day Closing and Security Card (إغلاق اليوم ووضع القراءة)
+                item {
+                    Card(
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (uiState.isDayClosed) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surface
+                        ),
+                        border = BorderStroke(
+                            1.dp,
+                            if (uiState.isDayClosed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = if (uiState.isDayClosed) Icons.Default.Lock else Icons.Default.LockOpen,
+                                    contentDescription = null,
+                                    tint = if (uiState.isDayClosed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "إغلاق واعتماد اليوم الحسابي ووضع القراءة",
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                )
+                            }
+
+                            Text(
+                                text = if (uiState.isDayClosed)
+                                    "اليوم مغلق ومُعتمد رسمياً 🔒. كافة الإدخالات والتعديلات متوقفة ومحمية ضد أي تغيير."
+                                else
+                                    "عند انتهاء الوردية أو اليوم الحسابي، يمكنك إغلاق اليوم لتجميد كافة الإدخالات ومنع أي تعديل إلا بعد تحذير شديد.",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = if (uiState.isDayClosed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                                    fontSize = 11.sp
+                                )
+                            )
+
+                            // Close Day Button
+                            Button(
+                                onClick = { viewModel.requestCloseDay() },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (uiState.isDayClosed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = if (uiState.isDayClosed) Icons.Default.LockReset else Icons.Default.LockClock,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = if (uiState.isDayClosed) "فك إغلاق اليوم (يتطلب تحذير شديد) ⚠️" else "إغلاق واعتماد اليوم الآن 🔒",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+
+                            // Read Only Mode Row
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "وضع القراءة فقط",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    )
+                                    Text(
+                                        text = "تجميد النقر على الحقول ومنع التعديل العرضي للأرقام.",
+                                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 10.sp)
+                                    )
+                                }
+                                Switch(
+                                    checked = uiState.isReadOnlyMode,
+                                    onCheckedChange = { viewModel.toggleReadOnlyMode() },
+                                    modifier = Modifier.testTag("switch_read_only_management")
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // 3. Group Balance & Report Options in Modes Menu
                 item {
                     Card(
@@ -1701,6 +1790,53 @@ fun ManagementScreen(
                                                         color = colorOptions[selectedColorOptionIndex].color,
                                                         onClick = colorOptions[selectedColorOptionIndex].onPick
                                                     )
+                                                }
+                                            }
+
+                                            // Transparency Sliders Section
+                                            Card(
+                                                shape = RoundedCornerShape(12.dp),
+                                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                                            ) {
+                                                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                                    Text("🪟 التحكم في شفافية العناصر (Opacity & Transparency)", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+
+                                                    Column {
+                                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                                            Text("شفافية بطاقة الجدول", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                                            Text("${(uiState.customColorThemeState.tableCardAlpha * 100).toInt()}%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                                        }
+                                                        Slider(
+                                                            value = uiState.customColorThemeState.tableCardAlpha,
+                                                            onValueChange = { viewModel.setTableCardAlpha(it) },
+                                                            valueRange = 0.2f..1.0f
+                                                        )
+                                                    }
+
+                                                    Column {
+                                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                                            Text("شفافية رؤوس الأعمدة", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                                            Text("${(uiState.customColorThemeState.tableHeaderAlpha * 100).toInt()}%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                                        }
+                                                        Slider(
+                                                            value = uiState.customColorThemeState.tableHeaderAlpha,
+                                                            onValueChange = { viewModel.setTableHeaderAlpha(it) },
+                                                            valueRange = 0.2f..1.0f
+                                                        )
+                                                    }
+
+                                                    Column {
+                                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                                            Text("شفافية خلايا الإدخال", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                                            Text("${(uiState.customColorThemeState.tableCellAlpha * 100).toInt()}%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                                        }
+                                                        Slider(
+                                                            value = uiState.customColorThemeState.tableCellAlpha,
+                                                            onValueChange = { viewModel.setTableCellAlpha(it) },
+                                                            valueRange = 0.2f..1.0f
+                                                        )
+                                                    }
                                                 }
                                             }
 

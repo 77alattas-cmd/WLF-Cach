@@ -66,10 +66,36 @@ data class CustomColorThemeState(
 
     // 7. إطار الحدود الخارجية للتطبيق (App Outer Border)
     val appBorderColor: Long? = null,
-    val appBorderWidthDp: Int = 3
+    val appBorderWidthDp: Int = 3,
+
+    // 8. درجات الشفافية للعناصر (Transparency / Opacity Sliders)
+    val tableCardAlpha: Float = 1.0f,
+    val tableHeaderAlpha: Float = 1.0f,
+    val tableCellAlpha: Float = 1.0f,
+    val groupCardAlpha: Float = 1.0f
 ) {
     fun getColorOrNull(value: Long?): Color? = value?.let { 
         if (it == 0L) null else Color(it.toInt())
+    }
+
+    fun getEffectiveTableCardBg(defaultColor: Color): Color {
+        val base = getColorOrNull(tableCardBg) ?: defaultColor
+        return base.copy(alpha = (base.alpha * tableCardAlpha).coerceIn(0f, 1f))
+    }
+
+    fun getEffectiveTableHeaderBg(defaultColor: Color): Color {
+        val base = getColorOrNull(tableHeaderBg) ?: defaultColor
+        return base.copy(alpha = (base.alpha * tableHeaderAlpha).coerceIn(0f, 1f))
+    }
+
+    fun getEffectiveTableCellBg(defaultColor: Color): Color {
+        val base = getColorOrNull(cellGivenBg) ?: defaultColor
+        return base.copy(alpha = (base.alpha * tableCellAlpha).coerceIn(0f, 1f))
+    }
+
+    fun getEffectiveGroupCardBg(defaultColor: Color): Color {
+        val base = getColorOrNull(groupSummaryCardBg) ?: defaultColor
+        return base.copy(alpha = (base.alpha * groupCardAlpha).coerceIn(0f, 1f))
     }
 }
 
@@ -102,6 +128,106 @@ data class ColorThemePreset(
 object ColorPresetsRegistry {
     val presets = listOf(
         // ==================== ☀️ السمات النهارية ====================
+        ColorThemePreset(
+            name = "🏛️ سمة حجر الجرانيت الصخري",
+            description = "مظهر صخري جرانيتي طبيعي متين بدرجات الرمادي والصلابة الحجرية الأنيقة",
+            primaryColor = Color(0xFF64748B),
+            secondaryColor = Color(0xFF475569),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "جرانيت صخري 🏛️",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF475569,
+                topAppBarText = 0xFFF8FAFC,
+                tableHeaderBg = 0xFFE2E8F0,
+                tableHeaderText = 0xFF1E293B,
+                tableBorderColor = 0xFF94A3B8,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFF475569,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF94A3B8
+            )
+        ),
+        ColorThemePreset(
+            name = "👑 سمة الرخام الأبيض الملكي",
+            description = "مظهر رخامي ناصع ونقي بتعريقات كلاسيكية فخمة مريحة جداً للبصر والعمل المكتبي",
+            primaryColor = Color(0xFF0284C7),
+            secondaryColor = Color(0xFF0F172A),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "رخام ملكي 👑",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF1E293B,
+                topAppBarText = 0xFFFFFFFF,
+                tableHeaderBg = 0xFFF1F5F9,
+                tableHeaderText = 0xFF0F172A,
+                tableBorderColor = 0xFFCBD5E1,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFF0284C7,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF94A3B8
+            )
+        ),
+        ColorThemePreset(
+            name = "🏛️ سمة الحجر والصخور الطبيعية",
+            description = "مظهر صخري حجري طبيعي متين وأنيق بدرجات الرمادي الترابي المريح",
+            primaryColor = Color(0xFF64748B),
+            secondaryColor = Color(0xFF475569),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "حجر وصخور 🏛️",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF475569,
+                topAppBarText = 0xFFF8FAFC,
+                tableHeaderBg = 0xFFE2E8F0,
+                tableHeaderText = 0xFF1E293B,
+                tableBorderColor = 0xFF94A3B8,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFF475569,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF94A3B8
+            )
+        ),
+        ColorThemePreset(
+            name = "🧊 سمة البلورات الصخرية والجليد",
+            description = "مظهر بلوري ناصع مستوحى من الصخور الجليدية النقية والشفافة",
+            primaryColor = Color(0xFF0284C7),
+            secondaryColor = Color(0xFF0369A1),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "جليد وبلورات 🧊",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF0284C7,
+                topAppBarText = 0xFFFFFFFF,
+                tableHeaderBg = 0xFFE0F2FE,
+                tableHeaderText = 0xFF0369A1,
+                tableBorderColor = 0xFF38BDF8,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFF0284C7,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF38BDF8
+            )
+        ),
+        ColorThemePreset(
+            name = "🧵 سمة الجلد الطبيعي المخرم",
+            description = "مظهر الجلد الملكي الفاخر بتخريمات ناعمة وتطريز هافان وأسود أنيق",
+            primaryColor = Color(0xFF9A3412),
+            secondaryColor = Color(0xFF7C2D12),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "جلد مخرم 🧵",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF7C2D12,
+                topAppBarText = 0xFFFEF3C7,
+                tableHeaderBg = 0xFFFFEDD5,
+                tableHeaderText = 0xFF7C2D12,
+                tableBorderColor = 0xFFC2410C,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFF9A3412,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFFC2410C
+            )
+        ),
         ColorThemePreset(
             name = "🏛️ سمة الجدار المحبب المعماري",
             description = "مظهر جداري إسمنتي محبب ناعم وعصري بطابع معماري مريح للبصر",
@@ -265,8 +391,88 @@ object ColorPresetsRegistry {
 
         // ==================== 🌙 السمات الليلية ====================
         ColorThemePreset(
+            name = "⚡ سمة البلازما المشعة الزرقاء",
+            description = "مظهر كوانتومي ليلي فائق الجرأة مع خطوط بلازما ساطعة بدرجات الأزرق النيوني المشع",
+            primaryColor = Color(0xFF38BDF8),
+            secondaryColor = Color(0xFF0284C7),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "بلازما مشعة ⚡",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF08273A,
+                topAppBarText = 0xFFE0F2FE,
+                tableHeaderBg = 0xFF031E2F,
+                tableHeaderText = 0xFF38BDF8,
+                tableBorderColor = 0xFF0284C7,
+                tableCardBg = 0xFF02131E,
+                groupActiveTabBg = 0xFF0284C7,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF38BDF8
+            )
+        ),
+        ColorThemePreset(
+            name = "🪵 سمة خشب الجوز الإيطالي الفاخر",
+            description = "مظهر ليلي كلاسيكي دافئ مستوحى من أخشاب الجوز الفاخرة بدرجات الشوكولاتة والقهوة الملكية",
+            primaryColor = Color(0xFFD97706),
+            secondaryColor = Color(0xFFB45309),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "خشب جوز 🪵",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF271A0C,
+                topAppBarText = 0xFFFEF3C7,
+                tableHeaderBg = 0xFF1C1207,
+                tableHeaderText = 0xFFFBBF24,
+                tableBorderColor = 0xFF92400E,
+                tableCardBg = 0xFF150D05,
+                groupActiveTabBg = 0xFFB45309,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFFD97706
+            )
+        ),
+        ColorThemePreset(
+            name = "☢️ سمة المواد المشعة والنيون",
+            description = "مظهر ليلي داكن مع إضاءات نيون مشعة باللون الأخضر والفوسفوري الفسفوري الفاخر",
+            primaryColor = Color(0xFF10B981),
+            secondaryColor = Color(0xFF059669),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "مواد مشعة ☢️",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF064E3B,
+                topAppBarText = 0xFFD1FAE5,
+                tableHeaderBg = 0xFF022C22,
+                tableHeaderText = 0xFF34D399,
+                tableBorderColor = 0xFF10B981,
+                tableCardBg = 0xFF031913,
+                groupActiveTabBg = 0xFF059669,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF10B981
+            )
+        ),
+        ColorThemePreset(
+            name = "🌋 سمة الصهارة البركانية الداكنة",
+            description = "مظهر صخري بركاني داكن مع توهجات الحمم الحمراء والبرتقالية المضيئة",
+            primaryColor = Color(0xFFF97316),
+            secondaryColor = Color(0xFFEA580C),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "صهارة بركانية 🌋",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF431407,
+                topAppBarText = 0xFFFFEDD5,
+                tableHeaderBg = 0xFF2C0B04,
+                tableHeaderText = 0xFFFB923C,
+                tableBorderColor = 0xFFF97316,
+                tableCardBg = 0xFF1A0702,
+                groupActiveTabBg = 0xFFEA580C,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFFF97316
+            )
+        ),
+        ColorThemePreset(
             name = "🏎️ سمة كاربون فايبر الرياضي",
-            description = "مظهر ألياف الكربون الرياضية المنسوجة الداكنة بتباين أحمر وفحمي فائق الأناقة",
+            description = "مظهر ألياف الكربون الرياضية المنسوجة الداكنة بتباين أحمر والفحمي فائق الأناقة",
             primaryColor = Color(0xFFEF4444),
             secondaryColor = Color(0xFF1E293B),
             isNightMode = true,
@@ -282,26 +488,6 @@ object ColorPresetsRegistry {
                 groupActiveTabBg = 0xFFDC2626,
                 groupActiveTabText = 0xFFFFFFFF,
                 appBorderColor = 0xFFEF4444
-            )
-        ),
-        ColorThemePreset(
-            name = "💺 سمة الجلد المخرم الفاخر",
-            description = "مظهر الجلد الملكي الفاخر بتخريمات ناعمة وتطريز هافان وأسود أنيق",
-            primaryColor = Color(0xFFD97706),
-            secondaryColor = Color(0xFF78350F),
-            isNightMode = true,
-            isSeasonal = false,
-            seasonBadge = "جلد فاخر 💺",
-            state = CustomColorThemeState(
-                topAppBarBg = 0xFF1C1917,
-                topAppBarText = 0xFFFDE68A,
-                tableHeaderBg = 0xFF292524,
-                tableHeaderText = 0xFFF59E0B,
-                tableBorderColor = 0xFFB45309,
-                tableCardBg = 0xFF1C1917,
-                groupActiveTabBg = 0xFFB45309,
-                groupActiveTabText = 0xFFFFFFFF,
-                appBorderColor = 0xFFD97706
             )
         ),
         ColorThemePreset(
@@ -362,6 +548,166 @@ object ColorPresetsRegistry {
                 groupActiveTabBg = 0xFF27272A,
                 groupActiveTabText = 0xFFFFFFFF,
                 appBorderColor = 0xFF52525B
+            )
+        ),
+        ColorThemePreset(
+            name = "👑 سمة الذهب والسبائك الملكية الليلية",
+            description = "مظهر ليلي أسود كربوني عميق بتطعيمات الذهب الخالص والبرونز الملكي البراق",
+            primaryColor = Color(0xFFF59E0B),
+            secondaryColor = Color(0xFFD97706),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "ذهب ملكي 👑",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF140F04,
+                topAppBarText = 0xFFFEF3C7,
+                tableHeaderBg = 0xFF231B08,
+                tableHeaderText = 0xFFFBBF24,
+                tableBorderColor = 0xFFD97706,
+                tableCardBg = 0xFF0D0A03,
+                groupActiveTabBg = 0xFFB45309,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFFF59E0B
+            )
+        ),
+        ColorThemePreset(
+            name = "🌌 سمة الفضاء السديمي والكون",
+            description = "مظهر كوني داكن بدرجات البنفسجي السديمي والنيلي المتوهج بنجوم الفضاء",
+            primaryColor = Color(0xFF8B5CF6),
+            secondaryColor = Color(0xFF6D28D9),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "فضاء كوني 🌌",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF0F0B1E,
+                topAppBarText = 0xFFEDE9FE,
+                tableHeaderBg = 0xFF1A1235,
+                tableHeaderText = 0xFFA78BFA,
+                tableBorderColor = 0xFF7C3AED,
+                tableCardBg = 0xFF0A0714,
+                groupActiveTabBg = 0xFF6D28D9,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF8B5CF6
+            )
+        ),
+        ColorThemePreset(
+            name = "🌲 سمة الزمرد وغابات الليل",
+            description = "مظهر طبيعي داكن مستوحى من أشجار الغابات ليلاً بتوهج الزمرد المريح للعين",
+            primaryColor = Color(0xFF059669),
+            secondaryColor = Color(0xFF047857),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "زمرد ليلي 🌲",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF04140D,
+                topAppBarText = 0xFFD1FAE5,
+                tableHeaderBg = 0xFF09291B,
+                tableHeaderText = 0xFF10B981,
+                tableBorderColor = 0xFF059669,
+                tableCardBg = 0xFF020B07,
+                groupActiveTabBg = 0xFF047857,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF10B981
+            )
+        ),
+        ColorThemePreset(
+            name = "🌊 سمة أعماق الهاوية البحرية",
+            description = "مظهر ليلي فائق العمق مستوحى من خنادق المحيط بدرجات التيركواز والأزرق الغامق",
+            primaryColor = Color(0xFF06B6D4),
+            secondaryColor = Color(0xFF0891B2),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "أعماق البحر 🌊",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF031520,
+                topAppBarText = 0xFFCFFAFE,
+                tableHeaderBg = 0xFF08273A,
+                tableHeaderText = 0xFF22D3EE,
+                tableBorderColor = 0xFF0891B2,
+                tableCardBg = 0xFF020E17,
+                groupActiveTabBg = 0xFF0891B2,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF06B6D4
+            )
+        ),
+        ColorThemePreset(
+            name = "⚡ سمة الصاعقة الزرقاء الكهربائية",
+            description = "مظهر كحلي داكن وفخم بإشعاع أزرق كهربائي فوسفوري عالي التباين",
+            primaryColor = Color(0xFF3B82F6),
+            secondaryColor = Color(0xFF2563EB),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "صاعقة زرقاء ⚡",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF091224,
+                topAppBarText = 0xFFDBEAFE,
+                tableHeaderBg = 0xFF122448,
+                tableHeaderText = 0xFF60A5FA,
+                tableBorderColor = 0xFF2563EB,
+                tableCardBg = 0xFF050B17,
+                groupActiveTabBg = 0xFF1D4ED8,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF3B82F6
+            )
+        ),
+        ColorThemePreset(
+            name = "🌹 سمة الياقوت والمخمل الأسود",
+            description = "مظهر مخملي أسود ملكي بلمسات الياقوت الأحمر القرمزي الداكن والفاخر",
+            primaryColor = Color(0xFFE11D48),
+            secondaryColor = Color(0xFFBE123C),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "ياقوت ملكي 🌹",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF1C060B,
+                topAppBarText = 0xFFFFE4E6,
+                tableHeaderBg = 0xFF300B13,
+                tableHeaderText = 0xFFFB7185,
+                tableBorderColor = 0xFFBE123C,
+                tableCardBg = 0xFF120307,
+                groupActiveTabBg = 0xFF9F1239,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFFE11D48
+            )
+        ),
+        ColorThemePreset(
+            name = "☕ سمة القهوة الداكنة والموكا",
+            description = "مظهر بني إسبريسو داكن ودافئ مع درجات الكراميل الذهبي المريح في العمل الليلي",
+            primaryColor = Color(0xFFB45309),
+            secondaryColor = Color(0xFF78350F),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "موكا داكنة ☕",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF160E08,
+                topAppBarText = 0xFFFEF3C7,
+                tableHeaderBg = 0xFF26180E,
+                tableHeaderText = 0xFFF59E0B,
+                tableBorderColor = 0xFF92400E,
+                tableCardBg = 0xFF0D0805,
+                groupActiveTabBg = 0xFF78350F,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFFB45309
+            )
+        ),
+        ColorThemePreset(
+            name = "🔮 سمة السايبر بانك والنيون البنفسجي",
+            description = "مظهر تقني داكن مستقبلي بتوهجات النيون البنفسجي والفوشيا المتألق",
+            primaryColor = Color(0xFFD946EF),
+            secondaryColor = Color(0xFFC026D3),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "سايبر بانك 🔮",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF18051E,
+                topAppBarText = 0xFFFAE8FF,
+                tableHeaderBg = 0xFF2C0938,
+                tableHeaderText = 0xFFE879F9,
+                tableBorderColor = 0xFFC026D3,
+                tableCardBg = 0xFF0F0214,
+                groupActiveTabBg = 0xFFA21CAF,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFFD946EF
             )
         )
     )
