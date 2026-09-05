@@ -112,6 +112,15 @@ fun TicketAccountingApp(
             val outerBorderColor = customColorState.getColorOrNull(customColorState.appBorderColor)
 
             var showGlobalResetDialog by remember { mutableStateOf(false) }
+            var showCategoryCalculatorDialog by remember { mutableStateOf(false) }
+
+            if (showCategoryCalculatorDialog) {
+                com.example.ui.components.SalesCategoryCalculatorDialog(
+                    groups = uiState.groups,
+                    initialGroupId = uiState.selectedGroupId,
+                    onDismiss = { showCategoryCalculatorDialog = false }
+                )
+            }
 
             if (showGlobalResetDialog) {
                 com.example.ui.components.ResetScopeDialog(
@@ -450,6 +459,18 @@ fun TicketAccountingApp(
                                              imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
                                             contentDescription = if (isDarkTheme) AppStrings.get("light_mode", lang) else AppStrings.get("dark_mode", lang),
                                             tint = if (isDarkTheme) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+
+                                    // Side Category Calculator Button
+                                    IconButton(
+                                        onClick = { showCategoryCalculatorDialog = true },
+                                        modifier = Modifier.testTag("top_bar_calculator_toggle")
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Calculate,
+                                            contentDescription = "آلة حاسبة الفئات الجانبية",
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
 

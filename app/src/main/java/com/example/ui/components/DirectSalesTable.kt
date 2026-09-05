@@ -46,6 +46,7 @@ fun DirectSalesTable(
     customColorState: CustomColorThemeState = CustomColorThemeState(),
     onToggleEnabled: (() -> Unit)? = null,
     onToggleMergeAdded: ((Boolean) -> Unit)? = null,
+    onToggleAddedField: (() -> Unit)? = null,
     onGivenChange: (Int, String) -> Unit,
     onAddedChange: (Int, String) -> Unit,
     onRemainingChange: (Int, String) -> Unit,
@@ -261,31 +262,63 @@ fun DirectSalesTable(
                         )
                     }
 
-                    if (isEnabled && !isLockGivenExtraMode && rows.size > 1) {
-                        FilterChip(
-                            selected = isTableReorderEnabled,
-                            onClick = { isTableReorderEnabled = !isTableReorderEnabled },
-                            label = {
-                                Text(
-                                    text = if (isTableReorderEnabled) "السحب مفعّل ⇅" else "ترتيب الفئات",
-                                    fontSize = 10.5.sp,
-                                    fontWeight = if (isTableReorderEnabled) FontWeight.Bold else FontWeight.Normal
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = if (isTableReorderEnabled) Icons.Default.SwapVert else Icons.Default.DragHandle,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                selectedLeadingIconColor = MaterialTheme.colorScheme.primary
-                            ),
-                            modifier = Modifier.testTag("btn_table_reorder_${groupName}")
-                        )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (isEnabled && !isLockGivenExtraMode && onToggleAddedField != null) {
+                            FilterChip(
+                                selected = isAddedFieldEnabled,
+                                onClick = { onToggleAddedField() },
+                                label = {
+                                    Text(
+                                        text = if (isAddedFieldEnabled) "الإضافي مفعّل ✓" else "إضافي",
+                                        fontSize = 10.5.sp,
+                                        fontWeight = if (isAddedFieldEnabled) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = if (isAddedFieldEnabled) Icons.Default.AddCircle else Icons.Default.AddCircleOutline,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    selectedLeadingIconColor = MaterialTheme.colorScheme.secondary
+                                ),
+                                modifier = Modifier.testTag("btn_table_toggle_added_${groupName}")
+                            )
+                        }
+
+                        if (isEnabled && !isLockGivenExtraMode && rows.size > 1) {
+                            FilterChip(
+                                selected = isTableReorderEnabled,
+                                onClick = { isTableReorderEnabled = !isTableReorderEnabled },
+                                label = {
+                                    Text(
+                                        text = if (isTableReorderEnabled) "السحب مفعّل ⇅" else "ترتيب الفئات",
+                                        fontSize = 10.5.sp,
+                                        fontWeight = if (isTableReorderEnabled) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = if (isTableReorderEnabled) Icons.Default.SwapVert else Icons.Default.DragHandle,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    selectedLeadingIconColor = MaterialTheme.colorScheme.primary
+                                ),
+                                modifier = Modifier.testTag("btn_table_reorder_${groupName}")
+                            )
+                        }
                     }
                 }
 

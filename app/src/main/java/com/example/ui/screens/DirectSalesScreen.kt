@@ -61,7 +61,6 @@ fun DirectSalesScreen(
     var showAddSalesGroupDialog by remember { mutableStateOf(false) }
     var showResetAllConfirmDialog by remember { mutableStateOf(false) }
     var isGroupTabsReorderEnabled by remember { mutableStateOf(false) }
-    var showCategoryCalculatorDialog by remember { mutableStateOf(false) }
 
     // Auto-scroll when selected group changes in Tab mode
     LaunchedEffect(uiState.selectedGroupId) {
@@ -382,7 +381,7 @@ fun DirectSalesScreen(
             }
         }
 
-        // 2.5 Toolbar: Controls, Added Toggle, Calculator, Accordion, and Reorder
+        // 2.5 Toolbar: Controls, Accordion, and Reorder
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -391,54 +390,6 @@ fun DirectSalesScreen(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // زر الإضافي (يظهر مربع دمج الإضافي في رأس كل مجموعة)
-            FilledTonalButton(
-                onClick = { viewModel.toggleGlobalAddedField() },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = if (uiState.isGlobalAddedFieldActive) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (uiState.isGlobalAddedFieldActive) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-                ),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                modifier = Modifier.height(30.dp).testTag("btn_toggle_global_added")
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AddCircleOutline,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = if (uiState.isGlobalAddedFieldActive) "الإضافي ✓" else "الإضافي",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // زر آلة حاسبة الفئات المتطورة مع لوحة أرقام وشاشة تأكيد
-            FilledTonalButton(
-                onClick = { showCategoryCalculatorDialog = true },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.primary
-                ),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                modifier = Modifier.height(30.dp).testTag("btn_open_category_calculator")
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Calculate,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "آلة حاسبة",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
             FilledTonalButton(
                 onClick = { viewModel.toggleSalesAccordionMode(!uiState.isSalesAccordionMode) },
                 shape = RoundedCornerShape(8.dp),
@@ -668,9 +619,10 @@ fun DirectSalesScreen(
                                                     groupName = group.name,
                                                     isEnabled = group.isEnabled && !uiState.isReadOnlyMode && !uiState.isDayClosed,
                                                     isLockGivenExtraMode = uiState.isLockGivenExtraMode,
-                                                    isAddedFieldEnabled = uiState.isGlobalAddedFieldActive || group.isAddedFieldEnabled,
+                                                    isAddedFieldEnabled = group.isAddedFieldEnabled,
                                                     mergeAddedWithGiven = group.mergeAddedWithGiven,
                                                     onToggleMergeAdded = { viewModel.toggleGroupMergeAdded(group.id) },
+                                                    onToggleAddedField = { viewModel.toggleGroupAddedField(group.id) },
                                                     showRemainingStepper = uiState.showRemainingStepper,
                                                     customColorState = uiState.customColorThemeState,
                                                     onGivenChange = { denom, givenStr -> viewModel.updateGiven(group.id, denom, givenStr) },
@@ -758,9 +710,10 @@ fun DirectSalesScreen(
                                     groupName = currentSelectedGroup.name,
                                     isEnabled = currentSelectedGroup.isEnabled && !uiState.isReadOnlyMode && !uiState.isDayClosed,
                                     isLockGivenExtraMode = uiState.isLockGivenExtraMode,
-                                    isAddedFieldEnabled = uiState.isGlobalAddedFieldActive || currentSelectedGroup.isAddedFieldEnabled,
+                                    isAddedFieldEnabled = currentSelectedGroup.isAddedFieldEnabled,
                                     mergeAddedWithGiven = currentSelectedGroup.mergeAddedWithGiven,
                                     onToggleMergeAdded = { viewModel.toggleGroupMergeAdded(currentSelectedGroup.id) },
+                                    onToggleAddedField = { viewModel.toggleGroupAddedField(currentSelectedGroup.id) },
                                     showRemainingStepper = uiState.showRemainingStepper,
                                     customColorState = uiState.customColorThemeState,
                                     onGivenChange = { denom, givenStr -> viewModel.updateGiven(currentSelectedGroup.id, denom, givenStr) },
@@ -979,17 +932,6 @@ fun DirectSalesScreen(
             allSalesGroups = uiState.groups,
             allCashGroups = uiState.cashGroups,
             isSalesSection = true
-        )
-    }
-
-    if (showCategoryCalculatorDialog) {
-        com.example.ui.components.SalesCategoryCalculatorDialog(
-            groups = activeGroups,
-            initialGroupId = uiState.selectedGroupId,
-            onDismiss = { showCategoryCalculatorDialog = false },
-            onCommitSales = { grpId, targetField, quantities ->
-                viewModel.commitSalesFromCalculator(grpId, targetField, quantities)
-            }
         )
     }
 }
