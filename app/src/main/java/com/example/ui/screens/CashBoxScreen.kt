@@ -39,6 +39,7 @@ import com.example.ui.model.CalcAppSection
 import com.example.ui.components.*
 import com.example.ui.model.*
 import com.example.ui.viewmodel.TicketAccountingViewModel
+import com.example.ui.viewmodel.AppScreen
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -55,21 +56,9 @@ fun CashBoxScreen(
     val currentSelectedCashGroup = uiState.selectedCashGroup
     val activeCashGroups = uiState.cashGroups.filter { it.isEnabled }
 
-    // Auto-scroll when selected cash group changes in Tab mode
+    // Auto-scroll when selected cash group changes
     LaunchedEffect(uiState.selectedCashGroupId) {
-        if (!uiState.isCashBoxAccordionMode) {
-            listState.animateScrollToItem(0)
-        }
-    }
-
-    // Auto-scroll to expanded group in Accordion mode
-    LaunchedEffect(activeCashGroups.map { it.isExpanded }) {
-        if (uiState.isCashBoxAccordionMode) {
-            val expandedIndex = activeCashGroups.indexOfFirst { it.isExpanded }
-            if (expandedIndex != -1) {
-                listState.animateScrollToItem(expandedIndex)
-            }
-        }
+        listState.animateScrollToItem(0)
     }
 
     var showExpenseDialog by remember { mutableStateOf(false) }
@@ -82,9 +71,11 @@ fun CashBoxScreen(
     var showRebalanceDialog by remember { mutableStateOf(false) }
     var showAddCashGroupDialog by remember { mutableStateOf(false) }
     var showManageCashGroupsDialog by remember { mutableStateOf(false) }
+    var showOrganizeCenterDialog by remember { mutableStateOf(false) }
     var showResetAllConfirmDialog by remember { mutableStateOf(false) }
     var deletingExpenseItem by remember { mutableStateOf<Pair<String, String>?>(null) } // Pair(id, title)
     var isCashTabsReorderEnabled by remember { mutableStateOf(false) }
+    var cashIncreaseInput by remember { mutableStateOf("") }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -184,14 +175,23 @@ fun CashBoxScreen(
                             }
                         }
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = AccountingFormatter.formatDisplayDate(liveTimestamp, uiState.showHijriDate, uiState.useEasternArabicNumerals) + " | " + AccountingFormatter.formatTimeAndDay(liveTimestamp, uiState.useEasternArabicNumerals, uiState.use24HourFormat),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 10.5.sp
+                        Column {
+                            Text(
+                                text = AccountingFormatter.formatDisplayDate(liveTimestamp, uiState.showHijriDate, uiState.useEasternArabicNumerals),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontSize = 11.sp
+                                )
                             )
-                        )
+                            Text(
+                                text = AccountingFormatter.formatTimeAndDay(liveTimestamp, uiState.useEasternArabicNumerals, uiState.use24HourFormat),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = MaterialTheme.colorScheme.outline,
+                                    fontSize = 10.sp
+                                )
+                            )
+                        }
                     }
 
                     MiniBalanceStatusBadge(
@@ -322,41 +322,45 @@ fun CashBoxScreen(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // تبديل المطوية / التبويبات
+                // زر ترتيب الأقسام والصناديق بالسحب والإفلات
                 FilledTonalButton(
-                    onClick = { viewModel.toggleCashBoxAccordionMode(!uiState.isCashBoxAccordionMode) },
+                    onClick = { isCashTabsReorderEnabled = !isCashTabsReorderEnabled },
                     shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = if (isCashTabsReorderEnabled) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (isCashTabsReorderEnabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                    modifier = Modifier.height(30.dp).testTag("btn_toggle_cash_accordion")
+                    modifier = Modifier.height(30.dp).testTag("btn_toggle_cash_tabs_reorder")
                 ) {
                     Icon(
-                        imageVector = if (uiState.isCashBoxAccordionMode) Icons.Default.ViewAgenda else Icons.Default.VerticalSplit,
+                        imageVector = if (isCashTabsReorderEnabled) Icons.Default.SwapHoriz else Icons.Default.DragHandle,
                         contentDescription = null,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = if (uiState.isCashBoxAccordionMode) "تبويبات" else "مطوية",
+                        text = if (isCashTabsReorderEnabled) "السحب مفعّل ⇄" else "ترتيب الأقسام",
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = if (isCashTabsReorderEnabled) FontWeight.Bold else FontWeight.Normal
                     )
                 }
 
-                // زر تنظيم خاص بقسم الصندوق
+                // زر إضافة صندوق جديد
                 FilledTonalButton(
-                    onClick = { showManageCashGroupsDialog = true },
+                    onClick = { showAddCashGroupDialog = true },
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                    modifier = Modifier.height(30.dp).testTag("btn_manage_cash_groups")
+                    modifier = Modifier.height(30.dp).testTag("btn_add_cash_group_toolbar")
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Tune,
+                        imageVector = Icons.Default.Add,
                         contentDescription = null,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "تنظيم",
+                        text = "صندوق جديد",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -385,39 +389,9 @@ fun CashBoxScreen(
                         fontWeight = FontWeight.Bold
                     )
                 }
-
-                // زر ترتيب الأقسام والصناديق (ثابت دائماً ولا يختفي بتغيير نوع العرض)
-                FilledTonalButton(
-                    onClick = {
-                        if (uiState.isCashBoxAccordionMode) {
-                            showManageCashGroupsDialog = true
-                        } else {
-                            isCashTabsReorderEnabled = !isCashTabsReorderEnabled
-                        }
-                    },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = if (isCashTabsReorderEnabled && !uiState.isCashBoxAccordionMode) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (isCashTabsReorderEnabled && !uiState.isCashBoxAccordionMode) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                    modifier = Modifier.height(30.dp).testTag("btn_toggle_cash_tabs_reorder")
-                ) {
-                    Icon(
-                        imageVector = if (isCashTabsReorderEnabled && !uiState.isCashBoxAccordionMode) Icons.Default.SwapHoriz else Icons.Default.DragHandle,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = if (isCashTabsReorderEnabled && !uiState.isCashBoxAccordionMode) "السحب مفعّل ⇄" else "ترتيب الأقسام",
-                        fontSize = 11.sp,
-                        fontWeight = if (isCashTabsReorderEnabled && !uiState.isCashBoxAccordionMode) FontWeight.Bold else FontWeight.Normal
-                    )
-                }
             }
 
-            if (isCashTabsReorderEnabled && !uiState.isCashBoxAccordionMode) {
+            if (isCashTabsReorderEnabled) {
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f),
                     shape = RoundedCornerShape(8.dp),
@@ -461,17 +435,7 @@ fun CashBoxScreen(
 
                     FilterChip(
                         selected = isSelected,
-                        onClick = {
-                            viewModel.selectCashGroup(group.id)
-                            if (uiState.isCashBoxAccordionMode) {
-                                val idx = activeCashGroups.indexOfFirst { it.id == group.id }
-                                if (idx != -1) {
-                                    coroutineScope.launch {
-                                        try { listState.animateScrollToItem(idx) } catch (_: Exception) {}
-                                    }
-                                }
-                            }
-                        },
+                        onClick = { viewModel.selectCashGroup(group.id) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = activeTabColor,
                             containerColor = inactiveTabColor
@@ -516,112 +480,25 @@ fun CashBoxScreen(
             contentPadding = PaddingValues(top = 4.dp, bottom = if (numpad.isVisible) 360.dp else 80.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            if (!uiState.isCashBoxAccordionMode) {
-                // TABS MODE
-                val currentCashGroup = activeCashGroups.find { it.id == (uiState.selectedCashGroupId ?: activeCashGroups.firstOrNull()?.id) }
-                if (currentCashGroup != null) {
-                    item(key = currentCashGroup.id) {
-                        val rateVal = uiState.exchangeRateInput.toDoubleOrNull() ?: 380.0
-                        val cashYerVal = uiState.cashInBoxYerInput.trim().toDoubleOrNull() ?: 0.0
-                        val groupTotal = currentCashGroup.getTotalYer(rateVal, cashYerVal)
-                        
-                        ExpandableCashGroupCard(
-                            group = currentCashGroup,
-                            groupTotal = groupTotal,
-                            isExpanded = true,
-                            onToggleExpand = { },
-                            isReadOnly = uiState.isReadOnlyMode,
-                            content = {
-                                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    OutlinedTextField(
-                                        value = currentCashGroup.notes,
-                                        onValueChange = { viewModel.updateCashGroupNotes(currentCashGroup.id, it) },
-                                        label = { Text("ملاحظات مجموعة ${currentCashGroup.name}") },
-                                        singleLine = false,
-                                        minLines = 1,
-                                        maxLines = 3,
-                                        shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        textStyle = MaterialTheme.typography.bodyMedium,
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
-                                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                                        )
-                                    )
-                                    
-                                    when (currentCashGroup.type) {
-                                    CashGroupType.DENOMINATIONS -> {
-                                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                            if (currentCashGroup.id == CASH_GROUP_MAIN_ID) {
-                                                val displayCash = cashYerVal
-                                                com.example.ui.components.AppNumberField(
-                                                    value = uiState.cashInBoxYerInput,
-                                                    onValueChange = { viewModel.updateCashInBoxYer(it.filter { ch -> ch.isDigit() || ch == '.' }) },
-                                                    enabled = !uiState.isReadOnlyMode,
-                                                    label = { Text("النقد (الحالي: ${AccountingFormatter.formatYer(displayCash)})") },
-                                                    placeholder = { Text("0") },
-                                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                                    singleLine = true,
-                                                    textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
-                                                    colors = OutlinedTextFieldDefaults.colors(
-                                                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
-                                                    ),
-                                                    modifier = Modifier.fillMaxWidth().testTag("input_cash_yer")
-                                                )
-                                            }
-                                        }
-                                    }
-                                    CashGroupType.DIRECT_ENTRY, CashGroupType.EXPENSES, CashGroupType.DEPOSITS -> {
-                                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                            CashDirectGroupTable(
-                                                group = currentCashGroup,
-                                                exchangeRate = rateVal,
-                                                isReadOnly = uiState.isReadOnlyMode,
-                                                onAddEntry = { title, amount, currencyCode, isSar, customRate, notes, deductFromCash ->
-                                                    viewModel.addCashDirectEntry(currentCashGroup.id, title, amount, currencyCode, isSar, customExchangeRateInput = customRate?.toString() ?: "", customExchangeRate = customRate, notes = notes, deductFromCash = deductFromCash)
-                                                },
-                                                onUpdateEntry = { itemId, title, amount, currencyCode, isSar, customRate, notes, deductFromCash ->
-                                                    viewModel.updateCashDirectEntry(currentCashGroup.id, itemId, title, amount, currencyCode, isSar, customExchangeRateInput = customRate?.toString() ?: "", customExchangeRate = customRate, notes = notes, deductFromCash = deductFromCash)
-                                                },
-                                                onRemoveEntry = { itemId ->
-                                                    val itemTitle = currentCashGroup.directEntries.find { it.id == itemId }?.title ?: "البند المحدد"
-                                                    deletingExpenseItem = Pair(itemId, itemTitle)
-                                                },
-                                                onToggleEnabled = { viewModel.toggleCashGroupEnabled(currentCashGroup.id) },
-                                                onMergeEntries = { viewModel.mergeDuplicateEntries(currentCashGroup.id) },
-                                                onResetGroup = { viewModel.resetCashGroupOnly(currentCashGroup.id) }
-                                            )
-                                        }
-                                    }
-                                    }
-                                }
-                            }
-                        )
-                    }
-                }
-            } else {
-                // ACCORDION MODE
-
-            // Accordion Groups
-            activeCashGroups.forEach { group ->
-                item(key = group.id) {
+            val currentCashGroup = activeCashGroups.find { it.id == (uiState.selectedCashGroupId ?: activeCashGroups.firstOrNull()?.id) }
+            if (currentCashGroup != null) {
+                item(key = currentCashGroup.id) {
                     val rateVal = uiState.exchangeRateInput.toDoubleOrNull() ?: 380.0
                     val cashYerVal = uiState.cashInBoxYerInput.trim().toDoubleOrNull() ?: 0.0
-                    val groupTotal = group.getTotalYer(rateVal, cashYerVal)
+                    val groupTotal = currentCashGroup.getTotalYer(rateVal, cashYerVal)
                     
                     ExpandableCashGroupCard(
-                        group = group,
+                        group = currentCashGroup,
                         groupTotal = groupTotal,
-                        isExpanded = group.isExpanded,
-                        onToggleExpand = { viewModel.toggleCashGroupExpansion(group.id) },
+                        isExpanded = true,
+                        onToggleExpand = { },
                         isReadOnly = uiState.isReadOnlyMode,
                         content = {
                             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                 OutlinedTextField(
-                                    value = group.notes,
-                                    onValueChange = { viewModel.updateCashGroupNotes(group.id, it) },
-                                    label = { Text("ملاحظات مجموعة ${group.name}") },
+                                    value = currentCashGroup.notes,
+                                    onValueChange = { viewModel.updateCashGroupNotes(currentCashGroup.id, it) },
+                                    label = { Text("ملاحظات مجموعة ${currentCashGroup.name}") },
                                     singleLine = false,
                                     minLines = 1,
                                     maxLines = 3,
@@ -634,86 +511,140 @@ fun CashBoxScreen(
                                     )
                                 )
                                 
-                                when (group.type) {
+                                when (currentCashGroup.type) {
                                 CashGroupType.DENOMINATIONS -> {
                                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                        if (group.id == CASH_GROUP_MAIN_ID) {
+                                        if (currentCashGroup.id == CASH_GROUP_MAIN_ID) {
                                             val displayCash = cashYerVal
-                                            com.example.ui.components.AppNumberField(
-                                                value = uiState.cashInBoxYerInput,
-                                                onValueChange = { viewModel.updateCashInBoxYer(it.filter { ch -> ch.isDigit() || ch == '.' }) },
-                                                enabled = !uiState.isReadOnlyMode,
-                                                label = { Text("النقد (الحالي: ${AccountingFormatter.formatYer(displayCash)})") },
-                                                placeholder = { Text("0") },
-                                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                                singleLine = true,
-                                                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
-                                                colors = OutlinedTextFieldDefaults.colors(
-                                                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
-                                                ),
-                                                modifier = Modifier.fillMaxWidth().testTag("input_cash_yer")
-                                            )
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
+                                                com.example.ui.components.AppNumberField(
+                                                    value = uiState.cashInBoxYerInput,
+                                                    onValueChange = { viewModel.updateCashInBoxYer(it.filter { ch -> ch.isDigit() || ch == '.' }) },
+                                                    enabled = !uiState.isReadOnlyMode,
+                                                    label = { Text("النقد الحالي (${AccountingFormatter.formatYer(displayCash)})") },
+                                                    placeholder = { Text("0") },
+                                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                                    singleLine = true,
+                                                    textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
+                                                    colors = OutlinedTextFieldDefaults.colors(
+                                                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+                                                    ),
+                                                    modifier = Modifier.weight(1f).testTag("input_cash_yer")
+                                                )
+
+                                                if (!uiState.isReadOnlyMode) {
+                                                    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                                                        FilledTonalButton(
+                                                            onClick = {
+                                                                val currentVal = uiState.cashInBoxYerInput.toDoubleOrNull() ?: 0.0
+                                                                val newVal = (currentVal - 1000.0).coerceAtLeast(0.0)
+                                                                viewModel.updateCashInBoxYer(if (newVal == 0.0) "" else newVal.toLong().toString())
+                                                            },
+                                                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                                                            shape = RoundedCornerShape(8.dp),
+                                                            modifier = Modifier.height(42.dp)
+                                                        ) {
+                                                            Text("-1k", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                                        }
+                                                        FilledTonalButton(
+                                                            onClick = {
+                                                                val currentVal = uiState.cashInBoxYerInput.toDoubleOrNull() ?: 0.0
+                                                                val newVal = currentVal + 1000.0
+                                                                viewModel.updateCashInBoxYer(newVal.toLong().toString())
+                                                            },
+                                                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                                                            shape = RoundedCornerShape(8.dp),
+                                                            modifier = Modifier.height(42.dp)
+                                                        ) {
+                                                            Text("+1k", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                                        }
+                                                        FilledTonalButton(
+                                                            onClick = {
+                                                                val currentVal = uiState.cashInBoxYerInput.toDoubleOrNull() ?: 0.0
+                                                                val newVal = currentVal + 5000.0
+                                                                viewModel.updateCashInBoxYer(newVal.toLong().toString())
+                                                            },
+                                                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                                                            shape = RoundedCornerShape(8.dp),
+                                                            modifier = Modifier.height(42.dp)
+                                                        ) {
+                                                            Text("+5k", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            // زيادة النقد لتضاف للنقد الحالي
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
+                                                com.example.ui.components.AppNumberField(
+                                                    value = cashIncreaseInput,
+                                                    onValueChange = { cashIncreaseInput = it.filter { ch -> ch.isDigit() || ch == '.' } },
+                                                    enabled = !uiState.isReadOnlyMode,
+                                                    label = { Text("زيادة النقد (+)") },
+                                                    placeholder = { Text("أدخل المبلغ لإضافته للنقد الحالي") },
+                                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                                    singleLine = true,
+                                                    textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary),
+                                                    colors = OutlinedTextFieldDefaults.colors(
+                                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                                                    ),
+                                                    modifier = Modifier.weight(1f).testTag("input_cash_increase")
+                                                )
+
+                                                Button(
+                                                    onClick = {
+                                                        val amount = cashIncreaseInput.toDoubleOrNull() ?: 0.0
+                                                        if (amount > 0) {
+                                                            viewModel.addCashToBoxYer(amount)
+                                                            cashIncreaseInput = ""
+                                                        }
+                                                    },
+                                                    enabled = !uiState.isReadOnlyMode && (cashIncreaseInput.toDoubleOrNull() ?: 0.0) > 0,
+                                                    shape = RoundedCornerShape(8.dp),
+                                                    colors = ButtonDefaults.buttonColors(
+                                                        containerColor = MaterialTheme.colorScheme.primary,
+                                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                                    ),
+                                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                                    modifier = Modifier.height(52.dp).testTag("btn_apply_cash_increase")
+                                                ) {
+                                                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                    Text("إضافة للنقد", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                                }
+                                            }
                                         }
                                     }
                                 }
                                 CashGroupType.DIRECT_ENTRY, CashGroupType.EXPENSES, CashGroupType.DEPOSITS -> {
                                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                        if (false) {
-                                            com.example.ui.components.AppNumberField(
-                                                value = uiState.exchangeRateInput,
-                                                onValueChange = { viewModel.updateExchangeRate(it.filter { ch -> ch.isDigit() || ch == '.' }) },
-                                                enabled = !uiState.isReadOnlyMode,
-                                                label = { Text("سعر صرف الريال السعودي الافتراضي (1 ر.س. = ... ر.ي.)") },
-                                                placeholder = { Text("380") },
-                                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                                singleLine = true,
-                                                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
-                                                colors = OutlinedTextFieldDefaults.colors(
-                                                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
-                                                ),
-                                                modifier = Modifier.fillMaxWidth().testTag("input_exchange_rate")
-                                            )
-                                        }
-                                        
                                         CashDirectGroupTable(
-                                            group = group,
+                                            group = currentCashGroup,
                                             exchangeRate = rateVal,
                                             isReadOnly = uiState.isReadOnlyMode,
                                             onAddEntry = { title, amount, currencyCode, isSar, customRate, notes, deductFromCash ->
-                                                viewModel.addCashDirectEntry(
-                                                    groupId = group.id,
-                                                    title = title,
-                                                    amount = amount,
-                                                    currencyCode = currencyCode,
-                                                    isSar = isSar,
-                                                    customExchangeRateInput = customRate?.toString() ?: "",
-                                                    customExchangeRate = customRate,
-                                                    notes = notes,
-                                                    deductFromCash = deductFromCash
-                                                )
+                                                viewModel.addCashDirectEntry(currentCashGroup.id, title, amount, currencyCode, isSar, customExchangeRateInput = customRate?.toString() ?: "", customExchangeRate = customRate, notes = notes, deductFromCash = deductFromCash)
                                             },
                                             onUpdateEntry = { itemId, title, amount, currencyCode, isSar, customRate, notes, deductFromCash ->
-                                                viewModel.updateCashDirectEntry(
-                                                    groupId = group.id,
-                                                    id = itemId,
-                                                    title = title,
-                                                    amount = amount,
-                                                    currencyCode = currencyCode,
-                                                    isSar = isSar,
-                                                    customExchangeRate = customRate,
-                                                    notes = notes,
-                                                    deductFromCash = deductFromCash
-                                                )
+                                                viewModel.updateCashDirectEntry(currentCashGroup.id, itemId, title, amount, currencyCode, isSar, customExchangeRateInput = customRate?.toString() ?: "", customExchangeRate = customRate, notes = notes, deductFromCash = deductFromCash)
                                             },
                                             onRemoveEntry = { itemId ->
-                                                val itemTitle = group.directEntries.find { it.id == itemId }?.title ?: "البند المحدد"
+                                                val itemTitle = currentCashGroup.directEntries.find { it.id == itemId }?.title ?: "البند المحدد"
                                                 deletingExpenseItem = Pair(itemId, itemTitle)
                                             },
-                                            onToggleEnabled = { viewModel.toggleCashGroupEnabled(group.id) },
-                                            onMergeEntries = { viewModel.mergeDuplicateEntries(group.id) },
-                                            onResetGroup = { viewModel.resetCashGroupOnly(group.id) }
+                                            onToggleEnabled = { viewModel.toggleCashGroupEnabled(currentCashGroup.id) },
+                                            onMergeEntries = { viewModel.mergeDuplicateEntries(currentCashGroup.id) },
+                                            onResetGroup = { viewModel.resetCashGroupOnly(currentCashGroup.id) }
                                         )
                                     }
                                 }
@@ -722,7 +653,6 @@ fun CashBoxScreen(
                         }
                     )
                 }
-            }
             }
 
 
@@ -1298,6 +1228,18 @@ fun CashBoxScreen(
                 showAddCashGroupDialog = true
             },
             onDismiss = { showManageCashGroupsDialog = false }
+        )
+    }
+
+    if (showOrganizeCenterDialog) {
+        com.example.ui.components.OrganizeCenterDialog(
+            viewModel = viewModel,
+            isCashBox = true,
+            onDismiss = { showOrganizeCenterDialog = false },
+            onOpenReports = { viewModel.navigateTo(AppScreen.REPORTS) },
+            onOpenBalance = { viewModel.navigateTo(AppScreen.REPORTS) },
+            onOpenCategories = { showManageCashGroupsDialog = true },
+            onOpenManagement = { viewModel.navigateTo(AppScreen.MANAGEMENT) }
         )
     }
 

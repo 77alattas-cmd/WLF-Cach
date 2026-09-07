@@ -456,27 +456,7 @@ fun DirectEntryGroupTable(
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = if (group.isEnabled) "نشط" else "معطل",
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                color = if (group.isEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp
-                            )
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Switch(
-                            checked = group.isEnabled,
-                            onCheckedChange = { onToggleEnabled() },
-                            enabled = !isReadOnlyMode,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
-                            ),
-                            modifier = Modifier.testTag("group_enable_switch_${group.id}")
-                        )
-                    }
+
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -708,23 +688,7 @@ fun DirectEntryGroupTable(
                                 }
                             }
 
-                            if (onResetGroup != null) {
-                                FilledTonalButton(
-                                    onClick = { showResetDialog = true },
-                                    enabled = group.isEnabled,
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
-                                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                                    ),
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                    modifier = Modifier.height(28.dp)
-                                ) {
-                                    Icon(Icons.Default.DeleteSweep, contentDescription = null, modifier = Modifier.size(14.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("تصفير البنود", fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
+
                         }
                     }
                 }

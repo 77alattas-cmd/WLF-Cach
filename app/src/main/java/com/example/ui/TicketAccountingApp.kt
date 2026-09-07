@@ -118,7 +118,8 @@ fun TicketAccountingApp(
                 com.example.ui.components.SalesCategoryCalculatorDialog(
                     groups = uiState.groups,
                     initialGroupId = uiState.selectedGroupId,
-                    onDismiss = { showCategoryCalculatorDialog = false }
+                    onDismiss = { showCategoryCalculatorDialog = false },
+                    onCommitSales = { viewModel.commitSalesFromCalculator(it) }
                 )
             }
 
@@ -426,30 +427,6 @@ fun TicketAccountingApp(
                                         }
                                     }
 
-                                    // Lock Given & Extra Toggle Button (منع إدخال المعطى والإضافي)
-                                    IconButton(
-                                        onClick = { viewModel.toggleLockGivenExtraMode() },
-                                        modifier = Modifier.testTag("top_bar_lock_given_extra_toggle")
-                                    ) {
-                                        Icon(
-                                            imageVector = if (uiState.isLockGivenExtraMode) Icons.Default.Block else Icons.Default.Edit,
-                                            contentDescription = AppStrings.get("lock_given_extra", lang),
-                                            tint = if (uiState.isLockGivenExtraMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-
-                                    // Read-Only Mode Toggle Button (وضع القراءة)
-                                    IconButton(
-                                        onClick = { viewModel.toggleReadOnlyMode() },
-                                        modifier = Modifier.testTag("top_bar_readonly_toggle")
-                                    ) {
-                                        Icon(
-                                            imageVector = if (uiState.isReadOnlyMode) Icons.Default.Lock else Icons.Default.LockOpen,
-                                            contentDescription = AppStrings.get("read_only_mode", lang),
-                                            tint = if (uiState.isReadOnlyMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-
                                     // Day / Night Theme Toggle Button
                                     IconButton(
                                         onClick = { viewModel.toggleTheme() },
@@ -529,71 +506,41 @@ fun TicketAccountingApp(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 10.dp) // Raised slightly
                                 .vibrant3d(
-                                    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                                    shape = RoundedCornerShape(20.dp),
                                     elevation = 8.dp,
                                     isDark = isDark,
                                     baseColor = MaterialTheme.colorScheme.surface
                                 ),
-                            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                            shape = RoundedCornerShape(20.dp)
                         ) {
                             NavigationBar(
                                 containerColor = Color.Transparent,
                                 tonalElevation = 0.dp,
                                 modifier = Modifier.height(72.dp)
                             ) {
-                                // 1. المبيعات (سند)
-                                val directSalesLabel = AppStrings.get("nav_direct_sales", lang)
+                                // 1. الرئيسية (تجمع المبيعات والصندوق)
+                                val homeLabel = AppStrings.get("nav_home", lang)
                                 NavigationBarItem(
-                                    selected = currentScreen == AppScreen.DIRECT_SALES,
-                                    onClick = { viewModel.navigateTo(AppScreen.DIRECT_SALES) },
+                                    selected = currentScreen == AppScreen.HOME,
+                                    onClick = { viewModel.navigateTo(AppScreen.HOME) },
                                     icon = {
-                                        Box(contentAlignment = Alignment.TopEnd) {
-                                            Icon(
-                                                if (currentScreen == AppScreen.DIRECT_SALES) Icons.Filled.ConfirmationNumber else Icons.Outlined.ConfirmationNumber,
-                                                contentDescription = directSalesLabel,
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                            Icon(
-                                                Icons.Filled.KeyboardArrowUp,
-                                                contentDescription = null,
-                                                modifier = Modifier
-                                                    .size(14.dp)
-                                                    .offset(x = 6.dp, y = (-6).dp),
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
+                                        Icon(
+                                            if (currentScreen == AppScreen.HOME) Icons.Filled.Home else Icons.Outlined.Home,
+                                            contentDescription = homeLabel
+                                        )
                                     },
-                                    label = { Text(directSalesLabel, fontSize = 10.sp, fontWeight = if (currentScreen == AppScreen.DIRECT_SALES) FontWeight.Bold else FontWeight.Normal) },
+                                    label = { Text(homeLabel, fontSize = 10.sp, fontWeight = if (currentScreen == AppScreen.HOME) FontWeight.Bold else FontWeight.Normal) },
                                     colors = NavigationBarItemDefaults.colors(
                                         selectedIconColor = MaterialTheme.colorScheme.primary,
                                         selectedTextColor = MaterialTheme.colorScheme.primary,
                                         indicatorColor = MaterialTheme.colorScheme.primaryContainer
                                     ),
-                                    modifier = Modifier.testTag("nav_tab_direct_sales")
+                                    modifier = Modifier.testTag("nav_tab_home")
                                 )
 
-                                // 2. نقدي (الصندوق)
-                                val cashBoxLabel = AppStrings.get("nav_cash_box", lang)
-                                NavigationBarItem(
-                                    selected = currentScreen == AppScreen.CASH_BOX,
-                                    onClick = { viewModel.navigateTo(AppScreen.CASH_BOX) },
-                                    icon = {
-                                        Icon(
-                                            if (currentScreen == AppScreen.CASH_BOX) Icons.Filled.AccountBalanceWallet else Icons.Outlined.AccountBalanceWallet,
-                                            contentDescription = cashBoxLabel
-                                        )
-                                    },
-                                    label = { Text(cashBoxLabel, fontSize = 10.sp, fontWeight = if (currentScreen == AppScreen.CASH_BOX) FontWeight.Bold else FontWeight.Normal) },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = MaterialTheme.colorScheme.secondary,
-                                        selectedTextColor = MaterialTheme.colorScheme.secondary,
-                                        indicatorColor = MaterialTheme.colorScheme.secondaryContainer
-                                    ),
-                                    modifier = Modifier.testTag("nav_tab_cash_box")
-                                )
-
-                                // 3. الأوضاع والقوالب
+                                // 2. الأوضاع والقوالب
                                 val modesLabel = AppStrings.get("nav_modes", lang)
                                 NavigationBarItem(
                                     selected = currentScreen == AppScreen.MANAGEMENT,
@@ -755,6 +702,9 @@ fun TicketAccountingApp(
                                     AppScreen.ONBOARDING -> {
                                         OnboardingScreen(viewModel = viewModel)
                                     }
+                                    AppScreen.HOME -> {
+                                        HomeScreen(viewModel = viewModel)
+                                    }
                                     AppScreen.DIRECT_SALES -> {
                                         DirectSalesScreen(viewModel = viewModel)
                                     }
@@ -766,6 +716,12 @@ fun TicketAccountingApp(
                                     }
                                     AppScreen.MANAGEMENT -> {
                                         ManagementScreen(viewModel = viewModel)
+                                    }
+                                    AppScreen.MANAGEMENT_SALES -> {
+                                        ManagementSalesGroupsScreen(viewModel = viewModel)
+                                    }
+                                    AppScreen.MANAGEMENT_CASH -> {
+                                        ManagementCashGroupsScreen(viewModel = viewModel)
                                     }
                                     AppScreen.SETTINGS -> {
                                         SettingsScreen(viewModel = viewModel)

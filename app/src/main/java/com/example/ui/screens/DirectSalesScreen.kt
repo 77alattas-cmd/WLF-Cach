@@ -60,23 +60,12 @@ fun DirectSalesScreen(
     var showManageSalesGroupsDialog by remember { mutableStateOf(false) }
     var showAddSalesGroupDialog by remember { mutableStateOf(false) }
     var showResetAllConfirmDialog by remember { mutableStateOf(false) }
+    var showOrganizeCenterDialog by remember { mutableStateOf(false) }
     var isGroupTabsReorderEnabled by remember { mutableStateOf(false) }
 
-    // Auto-scroll when selected group changes in Tab mode
+    // Auto-scroll when selected group changes
     LaunchedEffect(uiState.selectedGroupId) {
-        if (!uiState.isSalesAccordionMode) {
-            listState.animateScrollToItem(0)
-        }
-    }
-
-    // Auto-scroll to expanded group in Accordion mode
-    LaunchedEffect(activeGroups.map { it.isExpanded }) {
-        if (uiState.isSalesAccordionMode) {
-            val expandedIndex = activeGroups.indexOfFirst { it.isExpanded }
-            if (expandedIndex != -1) {
-                listState.animateScrollToItem(expandedIndex)
-            }
-        }
+        listState.animateScrollToItem(0)
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -174,28 +163,6 @@ fun DirectSalesScreen(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 18.sp
                             )
-                        )
-                    }
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "التذاكر المباعة",
-                            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
-                        )
-                        Text(
-                            text = "${summary.totalSold} تذكرة",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        )
-                    }
-
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = "المتبقي الإجمالي",
-                            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
-                        )
-                        Text(
-                            text = "${summary.totalRemaining} تذكرة",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
                         )
                     }
                 }
@@ -381,7 +348,7 @@ fun DirectSalesScreen(
             }
         }
 
-        // 2.5 Toolbar: Controls, Accordion, and Reorder
+        // 2.5 Toolbar: Controls, Organize, and Reorder
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -390,40 +357,73 @@ fun DirectSalesScreen(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // زر ترتيب الأقسام
             FilledTonalButton(
-                onClick = { viewModel.toggleSalesAccordionMode(!uiState.isSalesAccordionMode) },
+                onClick = { isGroupTabsReorderEnabled = !isGroupTabsReorderEnabled },
                 shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = if (isGroupTabsReorderEnabled) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (isGroupTabsReorderEnabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                ),
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                modifier = Modifier.height(30.dp).testTag("btn_toggle_sales_accordion")
+                modifier = Modifier.height(30.dp).testTag("btn_toggle_sales_tabs_reorder")
             ) {
                 Icon(
-                    imageVector = if (uiState.isSalesAccordionMode) Icons.Default.ViewAgenda else Icons.Default.VerticalSplit,
+                    imageVector = if (isGroupTabsReorderEnabled) Icons.Default.SwapHoriz else Icons.Default.DragHandle,
                     contentDescription = null,
                     modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = if (uiState.isSalesAccordionMode) "تبويبات" else "مطوية",
+                    text = if (isGroupTabsReorderEnabled) "السحب مفعّل ⇄" else "ترتيب الأقسام",
                     fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = if (isGroupTabsReorderEnabled) FontWeight.Bold else FontWeight.Normal
                 )
             }
 
-            // زر تنظيم خاص بقسم مبيعات التذاكر
+            // زر إضافة قسم جديد
             FilledTonalButton(
-                onClick = { showManageSalesGroupsDialog = true },
+                onClick = { showAddSalesGroupDialog = true },
                 shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                modifier = Modifier.height(30.dp).testTag("btn_manage_sales_groups")
+                modifier = Modifier.height(30.dp).testTag("btn_add_new_sales_group_bar")
             ) {
                 Icon(
-                    imageVector = Icons.Default.Tune,
+                    imageVector = Icons.Default.Add,
                     contentDescription = null,
                     modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "تنظيم",
+                    text = "قسم جديد",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+
+            // زر منع تعديل المعطى والإضافي (قفل / فتح) بجانب زر التصفير
+            FilledTonalButton(
+                onClick = { viewModel.toggleLockGivenExtraMode() },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = if (uiState.isLockGivenExtraMode) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (uiState.isLockGivenExtraMode) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.height(30.dp).testTag("btn_toggle_lock_given_extra_bar")
+            ) {
+                Icon(
+                    imageVector = if (uiState.isLockGivenExtraMode) Icons.Default.Lock else Icons.Default.LockOpen,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = if (uiState.isLockGivenExtraMode) "مقفل" else "قفل المعطى",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -452,118 +452,86 @@ fun DirectSalesScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
+        }
 
-            // زر ترتيب الأقسام (ثابت دائماً ولا يختفي بتغيير نوع العرض)
-            FilledTonalButton(
-                onClick = {
-                    if (uiState.isSalesAccordionMode) {
-                        showManageSalesGroupsDialog = true
-                    } else {
-                        isGroupTabsReorderEnabled = !isGroupTabsReorderEnabled
-                    }
-                },
+        // 3. GROUPS TAB BAR
+        if (isGroupTabsReorderEnabled) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = if (isGroupTabsReorderEnabled && !uiState.isSalesAccordionMode) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (isGroupTabsReorderEnabled && !uiState.isSalesAccordionMode) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-                ),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                modifier = Modifier.height(30.dp).testTag("btn_toggle_sales_tabs_reorder")
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 2.dp)
             ) {
-                Icon(
-                    imageVector = if (isGroupTabsReorderEnabled && !uiState.isSalesAccordionMode) Icons.Default.SwapHoriz else Icons.Default.DragHandle,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = if (isGroupTabsReorderEnabled && !uiState.isSalesAccordionMode) "السحب مفعّل ⇄" else "ترتيب الأقسام",
-                    fontSize = 11.sp,
-                    fontWeight = if (isGroupTabsReorderEnabled && !uiState.isSalesAccordionMode) FontWeight.Bold else FontWeight.Normal
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Info, contentDescription = null, modifier = Modifier.size(13.dp), tint = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "سحب وإفلات تبويبات الأقسام مفعّل: اضغط مطولاً على التبويب واسحبه يميناً أو يساراً لإعادة الترتيب.",
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    )
+                }
             }
         }
 
-        // 3. GROUPS TAB BAR OR ACCORDIONS
-        if (!uiState.isSalesAccordionMode) {
-            if (isGroupTabsReorderEnabled) {
-                Surface(
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 2.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Default.Info, contentDescription = null, modifier = Modifier.size(13.dp), tint = MaterialTheme.colorScheme.primary)
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "سحب وإفلات تبويبات الأقسام مفعّل: اضغط مطولاً على التبويب واسحبه يميناً أو يساراً لإعادة الترتيب.",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                        )
-                    }
-                }
-            }
-
-            Surface(
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+            androidx.compose.foundation.layout.FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
-                androidx.compose.foundation.layout.FlowRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    val activeTabColor = uiState.customColorThemeState.getColorOrNull(uiState.customColorThemeState.groupActiveTabBg) ?: MaterialTheme.colorScheme.secondaryContainer
-                    val inactiveTabColor = uiState.customColorThemeState.getColorOrNull(uiState.customColorThemeState.groupInactiveTabBg) ?: Color.Transparent
-                    activeGroups.forEachIndexed { groupIndex, group ->
-                        val isSelected = group.id == uiState.selectedGroupId
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = { viewModel.selectGroup(group.id) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = activeTabColor,
-                                containerColor = inactiveTabColor
-                            ),
-                            label = {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        text = group.name,
-                                        fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal,
-                                        fontSize = 12.sp
-                                    )
-                                    Text(
-                                        text = AccountingFormatter.formatYer(group.totalRevenue),
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            fontSize = 9.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
-                                        )
-                                    )
-                                }
-                            },
-                            leadingIcon = if (isSelected) {
-                                { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp)) }
-                            } else null,
-                            modifier = Modifier
-                                .testTag("chip_sales_group_${group.id}")
-                                .reorderableHorizontalItem(
-                                    index = groupIndex,
-                                    itemCount = activeGroups.size,
-                                    isDragEnabled = isGroupTabsReorderEnabled,
-                                    onMove = { from, to -> viewModel.moveSalesGroup(from, to) }
+                val activeTabColor = uiState.customColorThemeState.getColorOrNull(uiState.customColorThemeState.groupActiveTabBg) ?: MaterialTheme.colorScheme.secondaryContainer
+                val inactiveTabColor = uiState.customColorThemeState.getColorOrNull(uiState.customColorThemeState.groupInactiveTabBg) ?: Color.Transparent
+                activeGroups.forEachIndexed { groupIndex, group ->
+                    val isSelected = group.id == uiState.selectedGroupId
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { viewModel.selectGroup(group.id) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = activeTabColor,
+                            containerColor = inactiveTabColor
+                        ),
+                        label = {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = group.name,
+                                    fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal,
+                                    fontSize = 12.sp
                                 )
-                        )
-                    }
+                                Text(
+                                    text = AccountingFormatter.formatYer(group.totalRevenue),
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                                    )
+                                )
+                            }
+                        },
+                        leadingIcon = if (isSelected) {
+                            { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                        } else null,
+                        modifier = Modifier
+                            .testTag("chip_sales_group_${group.id}")
+                            .reorderableHorizontalItem(
+                                index = groupIndex,
+                                itemCount = activeGroups.size,
+                                isDragEnabled = isGroupTabsReorderEnabled,
+                                onMove = { from, to -> viewModel.moveSalesGroup(from, to) }
+                            )
+                    )
                 }
             }
         }
@@ -577,186 +545,103 @@ fun DirectSalesScreen(
             contentPadding = PaddingValues(top = 4.dp, bottom = if (numpad.isVisible) 360.dp else 56.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (uiState.isSalesAccordionMode) {
-                if (activeGroups.isEmpty()) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center
+            if (currentSelectedGroup != null && currentSelectedGroup.isEnabled) {
+                val totalSoldTickets = if (currentSelectedGroup.type == SalesGroupType.DENOMINATIONS || currentSelectedGroup.type == SalesGroupType.CUSTOM_FIELDS) {
+                    currentSelectedGroup.rows.sumOf { it.sold }
+                } else {
+                    currentSelectedGroup.directEntries.size
+                }
+                val soldLabel = if (currentSelectedGroup.type == SalesGroupType.DIRECT_ENTRY) "عملية" else "تذكرة"
+
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
                         ) {
                             Text(
-                                text = "لا توجد مبيعات نشطة حالياً. يمكنك تفعيل المبيعات من تبويب تنظيم الأقسام.",
-                                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.outline)
+                                text = "إجمالي المباع في ${currentSelectedGroup.name}: $totalSoldTickets $soldLabel",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.secondary
+                                ),
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                             )
                         }
                     }
-                } else {
-                    activeGroups.forEach { group ->
-                        item(key = group.id) {
-                            ExpandableSalesGroupCard(
-                                group = group,
-                                isExpanded = group.isExpanded,
-                                onToggleExpand = { viewModel.toggleSalesGroupExpansion(group.id) },
-                                content = {
-                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        OutlinedTextField(
-                                            value = group.notes,
-                                            onValueChange = { viewModel.updateGroupNotes(group.id, it) },
-                                            label = { Text("ملاحظات ${group.name}") },
-                                            singleLine = false,
-                                            minLines = 1,
-                                            maxLines = 3,
-                                            shape = RoundedCornerShape(12.dp),
-                                            textStyle = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                        when (group.type) {
-                                            SalesGroupType.DENOMINATIONS, SalesGroupType.CUSTOM_FIELDS -> {
-                                                DirectSalesTable(
-                                                    rows = group.activeRows.ifEmpty { group.rows },
-                                                    groupName = group.name,
-                                                    isEnabled = group.isEnabled && !uiState.isReadOnlyMode && !uiState.isDayClosed,
-                                                    isLockGivenExtraMode = uiState.isLockGivenExtraMode,
-                                                    isAddedFieldEnabled = group.isAddedFieldEnabled,
-                                                    mergeAddedWithGiven = group.mergeAddedWithGiven,
-                                                    onToggleMergeAdded = { viewModel.toggleGroupMergeAdded(group.id) },
-                                                    onToggleAddedField = { viewModel.toggleGroupAddedField(group.id) },
-                                                    showRemainingStepper = uiState.showRemainingStepper,
-                                                    customColorState = uiState.customColorThemeState,
-                                                    onGivenChange = { denom, givenStr -> viewModel.updateGiven(group.id, denom, givenStr) },
-                                                    onAddedChange = { denom, addedStr -> viewModel.updateAdded(group.id, denom, addedStr) },
-                                                    onRemainingChange = { denom, remStr -> viewModel.updateRemaining(group.id, denom, remStr) },
-                                                    onNotesChange = { denom, notesStr -> viewModel.updateRowNotes(group.id, denom, notesStr) },
-                                                    onZeroOutRemaining = { denom -> viewModel.zeroOutRemaining(group.id, denom) },
-                                                    onZeroOutAllRemaining = { viewModel.zeroOutAllRemaining(group.id) },
-                                                    onRemoveCategory = { denom -> viewModel.deleteCategoryRow(group.id, denom) },
-                                                    onToggleRowEnabled = { denom -> viewModel.toggleRowEnabled(group.id, denom) },
-                                                    onMoveRow = { from, to -> viewModel.moveDenominationInGroup(group.id, from, to) }
-                                                )
-                                            }
-                                            SalesGroupType.DIRECT_ENTRY -> {
-                                                DirectEntryGroupTable(
-                                                    group = group,
-                                                    customColorState = uiState.customColorThemeState,
-                                                    isReadOnlyMode = uiState.isReadOnlyMode || uiState.isDayClosed,
-                                                    onAddEntry = { title, amount, qty, notes -> viewModel.addDirectEntry(group.id, title, amount, notes) },
-                                                    onAddDeposit = { title, amount, notes -> viewModel.addChiniDepositEntry(group.id, title, amount, notes) },
-                                                    onUpdateEntry = { id, title, amount, qty, notes -> viewModel.updateDirectEntry(group.id, id, title, amount, notes) },
-                                                    onRemoveEntry = { id -> viewModel.removeDirectEntry(group.id, id) },
-                                                    onQuickAddAmount = { amt -> viewModel.addDirectEntry(group.id, "إضافة سريعة", amt.toString()) },
-                                                    onToggleEnabled = { viewModel.toggleSalesGroupEnabled(group.id) },
-                                                    onMergeEntries = { viewModel.mergeDuplicateEntries(group.id) },
-                                                    onResetGroup = { viewModel.resetSalesGroupOnly(group.id) }
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
+                }
+
+                // Group Notes placed at top
+                item {
+                    OutlinedTextField(
+                        value = currentSelectedGroup.notes,
+                        onValueChange = { viewModel.updateGroupNotes(currentSelectedGroup.id, it) },
+                        label = { Text("ملاحظات ${currentSelectedGroup.name}") },
+                        singleLine = false,
+                        minLines = 1,
+                        maxLines = 3,
+                        shape = RoundedCornerShape(12.dp),
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    when (currentSelectedGroup.type) {
+                        SalesGroupType.DENOMINATIONS, SalesGroupType.CUSTOM_FIELDS -> {
+                            DirectSalesTable(
+                                rows = currentSelectedGroup.activeRows.ifEmpty { currentSelectedGroup.rows },
+                                groupName = currentSelectedGroup.name,
+                                isEnabled = currentSelectedGroup.isEnabled && !uiState.isReadOnlyMode && !uiState.isDayClosed,
+                                isLockGivenExtraMode = uiState.isLockGivenExtraMode,
+                                isAddedFieldEnabled = currentSelectedGroup.isAddedFieldEnabled,
+                                mergeAddedWithGiven = currentSelectedGroup.mergeAddedWithGiven,
+                                onToggleMergeAdded = { viewModel.toggleGroupMergeAdded(currentSelectedGroup.id) },
+                                onToggleAddedField = { viewModel.toggleGroupAddedField(currentSelectedGroup.id) },
+                                showRemainingStepper = uiState.showRemainingStepper,
+                                customColorState = uiState.customColorThemeState,
+                                onGivenChange = { denom, givenStr -> viewModel.updateGiven(currentSelectedGroup.id, denom, givenStr) },
+                                onAddedChange = { denom, addedStr -> viewModel.updateAdded(currentSelectedGroup.id, denom, addedStr) },
+                                onRemainingChange = { denom, remStr -> viewModel.updateRemaining(currentSelectedGroup.id, denom, remStr) },
+                                onNotesChange = { denom, notesStr -> viewModel.updateRowNotes(currentSelectedGroup.id, denom, notesStr) },
+                                onZeroOutRemaining = { denom -> viewModel.zeroOutRemaining(currentSelectedGroup.id, denom) },
+                                onZeroOutAllRemaining = { viewModel.zeroOutAllRemaining(currentSelectedGroup.id) },
+                                onRemoveCategory = { denom -> viewModel.deleteCategoryRow(currentSelectedGroup.id, denom) },
+                                onToggleRowEnabled = { denom -> viewModel.toggleRowEnabled(currentSelectedGroup.id, denom) },
+                                onMoveRow = { from, to -> viewModel.moveDenominationInGroup(currentSelectedGroup.id, from, to) }
+                            )
+                        }
+                        SalesGroupType.DIRECT_ENTRY -> {
+                            DirectEntryGroupTable(
+                                group = currentSelectedGroup,
+                                customColorState = uiState.customColorThemeState,
+                                isReadOnlyMode = uiState.isReadOnlyMode || uiState.isDayClosed,
+                                onAddEntry = { title, amount, qty, notes -> viewModel.addDirectEntry(currentSelectedGroup.id, title, amount, notes) },
+                                onAddDeposit = { title, amount, notes -> viewModel.addChiniDepositEntry(currentSelectedGroup.id, title, amount, notes) },
+                                onUpdateEntry = { id, title, amount, qty, notes -> viewModel.updateDirectEntry(currentSelectedGroup.id, id, title, amount, notes) },
+                                onRemoveEntry = { id -> viewModel.removeDirectEntry(currentSelectedGroup.id, id) },
+                                onQuickAddAmount = { amt -> viewModel.addDirectEntry(currentSelectedGroup.id, "إضافة سريعة", amt.toString()) },
+                                onToggleEnabled = { viewModel.toggleSalesGroupEnabled(currentSelectedGroup.id) },
+                                onMergeEntries = { viewModel.mergeDuplicateEntries(currentSelectedGroup.id) },
+                                onResetGroup = { viewModel.resetSalesGroupOnly(currentSelectedGroup.id) }
                             )
                         }
                     }
                 }
             } else {
-                if (currentSelectedGroup != null && currentSelectedGroup.isEnabled) {
-                    val totalSoldTickets = if (currentSelectedGroup.type == SalesGroupType.DENOMINATIONS || currentSelectedGroup.type == SalesGroupType.CUSTOM_FIELDS) {
-                        currentSelectedGroup.rows.sumOf { it.sold }
-                    } else {
-                        currentSelectedGroup.directEntries.size
-                    }
-                    val soldLabel = if (currentSelectedGroup.type == SalesGroupType.DIRECT_ENTRY) "عملية" else "تذكرة"
-
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-                            ) {
-                                Text(
-                                    text = "إجمالي المباع في ${currentSelectedGroup.name}: $totalSoldTickets $soldLabel",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    ),
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                                )
-                            }
-                        }
-                    }
-
-                    // Group Notes placed at top
-                    item {
-                        OutlinedTextField(
-                            value = currentSelectedGroup.notes,
-                            onValueChange = { viewModel.updateGroupNotes(currentSelectedGroup.id, it) },
-                            label = { Text("ملاحظات ${currentSelectedGroup.name}") },
-                            singleLine = false,
-                            minLines = 1,
-                            maxLines = 3,
-                            shape = RoundedCornerShape(12.dp),
-                            textStyle = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.fillMaxWidth()
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "لا توجد مبيعات نشطة حالياً. يمكنك تفعيل المبيعات من تبويب تنظيم الأقسام.",
+                            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.outline)
                         )
-                    }
-                    item {
-                        when (currentSelectedGroup.type) {
-                            SalesGroupType.DENOMINATIONS, SalesGroupType.CUSTOM_FIELDS -> {
-                                DirectSalesTable(
-                                    rows = currentSelectedGroup.activeRows.ifEmpty { currentSelectedGroup.rows },
-                                    groupName = currentSelectedGroup.name,
-                                    isEnabled = currentSelectedGroup.isEnabled && !uiState.isReadOnlyMode && !uiState.isDayClosed,
-                                    isLockGivenExtraMode = uiState.isLockGivenExtraMode,
-                                    isAddedFieldEnabled = currentSelectedGroup.isAddedFieldEnabled,
-                                    mergeAddedWithGiven = currentSelectedGroup.mergeAddedWithGiven,
-                                    onToggleMergeAdded = { viewModel.toggleGroupMergeAdded(currentSelectedGroup.id) },
-                                    onToggleAddedField = { viewModel.toggleGroupAddedField(currentSelectedGroup.id) },
-                                    showRemainingStepper = uiState.showRemainingStepper,
-                                    customColorState = uiState.customColorThemeState,
-                                    onGivenChange = { denom, givenStr -> viewModel.updateGiven(currentSelectedGroup.id, denom, givenStr) },
-                                    onAddedChange = { denom, addedStr -> viewModel.updateAdded(currentSelectedGroup.id, denom, addedStr) },
-                                    onRemainingChange = { denom, remStr -> viewModel.updateRemaining(currentSelectedGroup.id, denom, remStr) },
-                                    onNotesChange = { denom, notesStr -> viewModel.updateRowNotes(currentSelectedGroup.id, denom, notesStr) },
-                                    onZeroOutRemaining = { denom -> viewModel.zeroOutRemaining(currentSelectedGroup.id, denom) },
-                                    onZeroOutAllRemaining = { viewModel.zeroOutAllRemaining(currentSelectedGroup.id) },
-                                    onRemoveCategory = { denom -> viewModel.deleteCategoryRow(currentSelectedGroup.id, denom) },
-                                    onToggleRowEnabled = { denom -> viewModel.toggleRowEnabled(currentSelectedGroup.id, denom) },
-                                    onMoveRow = { from, to -> viewModel.moveDenominationInGroup(currentSelectedGroup.id, from, to) }
-                                )
-                            }
-                            SalesGroupType.DIRECT_ENTRY -> {
-                                DirectEntryGroupTable(
-                                    group = currentSelectedGroup,
-                                    customColorState = uiState.customColorThemeState,
-                                    isReadOnlyMode = uiState.isReadOnlyMode || uiState.isDayClosed,
-                                    onAddEntry = { title, amount, qty, notes -> viewModel.addDirectEntry(currentSelectedGroup.id, title, amount, notes) },
-                                    onAddDeposit = { title, amount, notes -> viewModel.addChiniDepositEntry(currentSelectedGroup.id, title, amount, notes) },
-                                    onUpdateEntry = { id, title, amount, qty, notes -> viewModel.updateDirectEntry(currentSelectedGroup.id, id, title, amount, notes) },
-                                    onRemoveEntry = { id -> viewModel.removeDirectEntry(currentSelectedGroup.id, id) },
-                                    onQuickAddAmount = { amt -> viewModel.addDirectEntry(currentSelectedGroup.id, "إضافة سريعة", amt.toString()) },
-                                    onToggleEnabled = { viewModel.toggleSalesGroupEnabled(currentSelectedGroup.id) },
-                                    onMergeEntries = { viewModel.mergeDuplicateEntries(currentSelectedGroup.id) },
-                                    onResetGroup = { viewModel.resetSalesGroupOnly(currentSelectedGroup.id) }
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "لا توجد مبيعات نشطة حالياً. يمكنك تفعيل المبيعات من تبويب تنظيم الأقسام.",
-                                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.outline)
-                            )
-                        }
                     }
                 }
             }
@@ -934,81 +819,16 @@ fun DirectSalesScreen(
             isSalesSection = true
         )
     }
-}
 
-@Composable
-fun ExpandableSalesGroupCard(
-    group: SalesGroupUiState,
-    isExpanded: Boolean,
-    onToggleExpand: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onToggleExpand() }
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text(
-                            text = group.name,
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        )
-                    }
-                }
-                    val totalSoldTickets = if (group.type == SalesGroupType.DENOMINATIONS || group.type == SalesGroupType.CUSTOM_FIELDS) {
-                        group.rows.sumOf { it.sold }
-                    } else {
-                        group.directEntries.size
-                    }
-                    val soldLabel = if (group.type == SalesGroupType.DIRECT_ENTRY) "عملية" else "تذكرة"
-
-                    Column(horizontalAlignment = Alignment.End) {
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer
-                        ) {
-                            Text(
-                                text = AccountingFormatter.formatYer(group.totalRevenue),
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                ),
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "المباع: $totalSoldTickets $soldLabel",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.secondary,
-                                fontSize = 10.sp
-                            )
-                        )
-                    }
-            }
-            if (isExpanded) {
-                Box(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                    content()
-                }
-            }
-        }
+    if (showOrganizeCenterDialog) {
+        com.example.ui.components.OrganizeCenterDialog(
+            viewModel = viewModel,
+            isCashBox = false,
+            onDismiss = { showOrganizeCenterDialog = false },
+            onOpenReports = { viewModel.navigateTo(AppScreen.REPORTS) },
+            onOpenBalance = { viewModel.navigateTo(AppScreen.REPORTS) },
+            onOpenCategories = { showManageSalesGroupsDialog = true },
+            onOpenManagement = { viewModel.navigateTo(AppScreen.MANAGEMENT) }
+        )
     }
 }

@@ -129,6 +129,46 @@ object ColorPresetsRegistry {
     val presets = listOf(
         // ==================== ☀️ السمات النهارية ====================
         ColorThemePreset(
+            name = "⚙️ سمة الفولاذ المصقول المعدني (الافتراضي)",
+            description = "السمة النهارية الافتراضية: مظهر معدني فاخر بدرجات الفولاذ الفضي والستيل المضيء عالي الوضوح",
+            primaryColor = Color(0xFF475569),
+            secondaryColor = Color(0xFF334155),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "الافتراضي ⚙️",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF475569,
+                topAppBarText = 0xFFFFFFFF,
+                tableHeaderBg = 0xFFE2E8F0,
+                tableHeaderText = 0xFF0F172A,
+                tableBorderColor = 0xFF94A3B8,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFF475569,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF94A3B8
+            )
+        ),
+        ColorThemePreset(
+            name = "🐅 سمة نادي الاتحاد السعودي (العميد والنمور)",
+            description = "مظهر رياضي ملكي ناصع بألوان نادي الاتحاد السعودي الأصيلة: الأصفر الذهبي والأسود الفخم بتطريز كربوني",
+            primaryColor = Color(0xFFEAB308),
+            secondaryColor = Color(0xFF18181B),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "نادي الاتحاد 🐅",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF18181B,
+                topAppBarText = 0xFFFEF08A,
+                tableHeaderBg = 0xFFFEF9C3,
+                tableHeaderText = 0xFF18181B,
+                tableBorderColor = 0xFFEAB308,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFFEAB308,
+                groupActiveTabText = 0xFF18181B,
+                appBorderColor = 0xFFEAB308
+            )
+        ),
+        ColorThemePreset(
             name = "🏛️ سمة حجر الجرانيت الصخري",
             description = "مظهر صخري جرانيتي طبيعي متين بدرجات الرمادي والصلابة الحجرية الأنيقة",
             primaryColor = Color(0xFF64748B),
@@ -390,6 +430,46 @@ object ColorPresetsRegistry {
         ),
 
         // ==================== 🌙 السمات الليلية ====================
+        ColorThemePreset(
+            name = "🛠️ سمة التيتانيوم الصلب الداكن (الافتراضي)",
+            description = "السمة الليلية الافتراضية: سمة معدنية صلبة فاخرة بخلفية التيتانيوم المسبوك الداكن مريحة جداً للعين",
+            primaryColor = Color(0xFF94A3B8),
+            secondaryColor = Color(0xFF64748B),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "الافتراضي 🛠️",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF0F172A,
+                topAppBarText = 0xFFF8FAFC,
+                tableHeaderBg = 0xFF1E293B,
+                tableHeaderText = 0xFFF1F5F9,
+                tableBorderColor = 0xFF334155,
+                tableCardBg = 0xFF0F172A,
+                groupActiveTabBg = 0xFF334155,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF475569
+            )
+        ),
+        ColorThemePreset(
+            name = "🐅 سمة نادي الاتحاد السعودي (العميد والنمور)",
+            description = "مظهر ليلي كربوني فخم بألوان نادي الاتحاد السعودي: أسود فاحم مع تطعيمات الأصفر والذهبي الملكي",
+            primaryColor = Color(0xFFFACC15),
+            secondaryColor = Color(0xFFEAB308),
+            isNightMode = true,
+            isSeasonal = false,
+            seasonBadge = "نادي الاتحاد 🐅",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF09090B,
+                topAppBarText = 0xFFFEF08A,
+                tableHeaderBg = 0xFF18181B,
+                tableHeaderText = 0xFFFACC15,
+                tableBorderColor = 0xFFEAB308,
+                tableCardBg = 0xFF09090B,
+                groupActiveTabBg = 0xFFCA8A04,
+                groupActiveTabText = 0xFF18181B,
+                appBorderColor = 0xFFEAB308
+            )
+        ),
         ColorThemePreset(
             name = "⚡ سمة البلازما المشعة الزرقاء",
             description = "مظهر كوانتومي ليلي فائق الجرأة مع خطوط بلازما ساطعة بدرجات الأزرق النيوني المشع",

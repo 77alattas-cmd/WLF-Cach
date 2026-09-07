@@ -783,23 +783,7 @@ fun CashDirectGroupTable(
                             }
                         }
 
-                        if (onResetGroup != null) {
-                            FilledTonalButton(
-                                onClick = { showResetDialog = true },
-                                enabled = !isReadOnly,
-                                shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
-                                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                                ),
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                modifier = Modifier.height(28.dp)
-                            ) {
-                                Icon(Icons.Default.DeleteSweep, contentDescription = null, modifier = Modifier.size(14.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("تصفير البنود", fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
+
                     }
                 }
             }

@@ -121,7 +121,6 @@ class NumpadController {
     fun updateValue(newValue: String) {
         val cleaned = cleanLeadingZeros(newValue)
         this.value = cleaned
-        this.shouldReplaceOnFirstDigit = cleaned.isNotEmpty() && cleaned != "0"
     }
 
     fun updateTargetInfo(title: String, subtitle: String = "", rowPreview: NumpadRowPreview? = null) {

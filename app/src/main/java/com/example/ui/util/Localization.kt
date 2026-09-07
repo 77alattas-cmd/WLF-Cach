@@ -10,6 +10,7 @@ object AppStrings {
     fun get(key: String, lang: String = "ar"): String {
         return when (key) {
             // Navigation
+            "nav_home" -> "الرئيسة"
             "nav_direct_sales" -> "مبيعات"
             "nav_cash_box" -> "الصندوق"
             "nav_reports" -> "البيان المالي"

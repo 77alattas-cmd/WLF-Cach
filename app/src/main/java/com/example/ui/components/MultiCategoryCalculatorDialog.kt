@@ -363,7 +363,11 @@ fun MultiCategoryCalculatorDialog(
                                                 AppNumberField(
                                                     value = currentQty,
                                                     onValueChange = { newVal ->
-                                                        denomMap[row.denomination] = newVal.filter { it.isDigit() }
+                                                        val filtered = newVal.filter { it.isDigit() }
+                                                        val qty = filtered.toIntOrNull() ?: 0
+                                                        if (qty <= row.remaining) {
+                                                            denomMap[row.denomination] = filtered
+                                                        }
                                                     },
                                                     placeholder = { Text("الكمية", fontSize = 9.sp) },
                                                     useCustomNumpadOnly = true,
@@ -382,7 +386,9 @@ fun MultiCategoryCalculatorDialog(
                                                     onClick = {
                                                         val q = (currentQty.toDoubleOrNull() ?: 0.0).toInt()
                                                         val newQ = q + 1
-                                                        denomMap[row.denomination] = newQ.toString()
+                                                        if (newQ <= row.remaining) {
+                                                            denomMap[row.denomination] = newQ.toString()
+                                                        }
                                                     },
                                                     modifier = Modifier.size(26.dp)
                                                 ) {

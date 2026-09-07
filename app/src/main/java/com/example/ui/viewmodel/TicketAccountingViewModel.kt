@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlin.math.abs
@@ -25,10 +26,13 @@ import kotlin.math.abs
 enum class AppScreen {
     SPLASH,       // الشاشة الترحيبية
     ONBOARDING,   // طبقة التعريف
+    HOME,         // الرئيسة (تجمع المبيعات والصندوق)
     DIRECT_SALES, // سند (المبيعات)
     CASH_BOX,     // نقدي (الصندوق)
     REPORTS,      // التقرير
     MANAGEMENT,   // تنظيم
+    MANAGEMENT_SALES, // تنظيم المبيعات
+    MANAGEMENT_CASH,  // تنظيم الصندوق
     SETTINGS      // الإعدادات
 }
 
@@ -49,32 +53,71 @@ data class AppThemePreset(
 )
 
 val PRESET_APP_THEMES = listOf(
-    // 🏎️ NEW MATERIAL TEXTURE THEMES (السمات الجديدة: كاربون فايبر، الجلد المخرم، الجدار المحبب، الخشبي الجميل)
+    // ☀️ DAY THEMES (السمات النهارية أولاً)
     AppThemePreset(
-        name = "🏎️ سمة كاربون فايبر الرياضي",
-        description = "مظهر ألياف الكربون الرياضية المنسوجة الداكنة بتباين أحمر وفحمي فائق الأناقة",
-        primaryColor = 0xFFEF4444,
-        headerBgColor = 0xFF18181B,
-        headerTextColor = 0xFFF4F4F5,
-        borderColor = 0xFFDC2626,
-        calculatorColor = 0xFF991B1B,
-        activeTabColor = 0xFFEF4444,
-        previewGradient = listOf(0xFF18181B, 0xFFEF4444),
-        isNightMode = true,
+        name = "⚙️ سمة الفولاذ المصقول (الافتراضي)",
+        description = "السمة النهارية الافتراضية: سمة فاخرة بدرجات الفولاذ الفضي والستيل المضيء عالي الوضوح",
+        primaryColor = 0xFF475569,
+        headerBgColor = 0xFFE2E8F0,
+        headerTextColor = 0xFF0F172A,
+        borderColor = 0xFF94A3B8,
+        calculatorColor = 0xFF334155,
+        activeTabColor = 0xFF475569,
+        previewGradient = listOf(0xFFE2E8F0, 0xFF64748B),
+        isNightMode = false,
+        bgStyle = "METALLIC_STEEL"
+    ),
+    AppThemePreset(
+        name = "🐅 سمة نادي الاتحاد السعودي (العميد والنمور)",
+        description = "مظهر رياضي ملكي ناصع بألوان نادي الاتحاد السعودي الأصيلة: الأصفر الذهبي والأسود الفخم",
+        primaryColor = 0xFFEAB308,
+        headerBgColor = 0xFFFEF9C3,
+        headerTextColor = 0xFF18181B,
+        borderColor = 0xFFEAB308,
+        calculatorColor = 0xFF18181B,
+        activeTabColor = 0xFFEAB308,
+        previewGradient = listOf(0xFFFEF08A, 0xFF18181B),
+        isNightMode = false,
         bgStyle = "TEXTURE_CARBON_FIBER"
     ),
     AppThemePreset(
-        name = "💺 سمة الجلد المخرم الفاخر",
-        description = "مظهر الجلد الملكي الفاخر بتخريمات ناعمة وتطريز هافان وأسود أنيق",
-        primaryColor = 0xFFD97706,
-        headerBgColor = 0xFF1C1917,
-        headerTextColor = 0xFFFDE68A,
-        borderColor = 0xFFB45309,
-        calculatorColor = 0xFF78350F,
-        activeTabColor = 0xFFD97706,
-        previewGradient = listOf(0xFF1C1917, 0xFFD97706),
-        isNightMode = true,
-        bgStyle = "TEXTURE_PERFORATED_LEATHER"
+        name = "💎 سمة الزمرد العصري الحديث",
+        description = "مظهر نهاري عصري ومنعش بتدرجات الزمرد والنعناع المريح للعين مع أبيض ناصع",
+        primaryColor = 0xFF059669,
+        headerBgColor = 0xFFECFDF5,
+        headerTextColor = 0xFF065F46,
+        borderColor = 0xFF10B981,
+        calculatorColor = 0xFF047857,
+        activeTabColor = 0xFF059669,
+        previewGradient = listOf(0xFFECFDF5, 0xFF10B981),
+        isNightMode = false,
+        bgStyle = "TEXTURE_GRANULAR_WALL"
+    ),
+    AppThemePreset(
+        name = "🌊 سمة النيلي المحيطي الهادئ",
+        description = "مظهر نهاري أنيق وعصري بدرجات الأزرق المحيطي والأزرق الفيروزي النقي",
+        primaryColor = 0xFF0284C7,
+        headerBgColor = 0xFFF0F9FF,
+        headerTextColor = 0xFF0369A1,
+        borderColor = 0xFF38BDF8,
+        calculatorColor = 0xFF0284C7,
+        activeTabColor = 0xFF0284C7,
+        previewGradient = listOf(0xFFF0F9FF, 0xFF0284C7),
+        isNightMode = false,
+        bgStyle = "TEXTURE_GRANULAR_WALL"
+    ),
+    AppThemePreset(
+        name = "🌸 سمة الورد المخملي الفاخر",
+        description = "مظهر نهاري ناعم بتدرجات الوردي والمارون الهادئ بتباين راقٍ",
+        primaryColor = 0xFFE11D48,
+        headerBgColor = 0xFFFFF1F2,
+        headerTextColor = 0xFF9F1239,
+        borderColor = 0xFFFB7185,
+        calculatorColor = 0xFFBE123C,
+        activeTabColor = 0xFFE11D48,
+        previewGradient = listOf(0xFFFFF1F2, 0xFFE11D48),
+        isNightMode = false,
+        bgStyle = "TEXTURE_GRANULAR_WALL"
     ),
     AppThemePreset(
         name = "🏛️ سمة الجدار المحبب المعماري",
@@ -102,11 +145,9 @@ val PRESET_APP_THEMES = listOf(
         isNightMode = false,
         bgStyle = "TEXTURE_WOOD_GRAIN"
     ),
-
-    // ⚙️ METALLIC THEMES (السمات المعدنية الفاخرة)
     AppThemePreset(
-        name = "⚙️ سمة الفولاذ المصقول المعدني",
-        description = "سمة معدنية فاخرة بدرجات الفولاذ الفضي والستيل المضيء",
+        name = "⚙️ سمة الفولاذ المصقول",
+        description = "سمة فاخرة بدرجات الفولاذ الفضي والستيل المضيء",
         primaryColor = 0xFF475569,
         headerBgColor = 0xFFE2E8F0,
         headerTextColor = 0xFF0F172A,
@@ -118,7 +159,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_STEEL"
     ),
     AppThemePreset(
-        name = "🪙 سمة الذهب المعدني البراق",
+        name = "🪙 سمة الذهب البراق",
         description = "خلفية وواجهة برّاقة بتدرجات الذهب الخالص والبرونز الفاخر",
         primaryColor = 0xFFB45309,
         headerBgColor = 0xFFFEF3C7,
@@ -131,8 +172,8 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_GOLD"
     ),
     AppThemePreset(
-        name = "⚙️ سمة الفضة المعدنية اللامعة",
-        description = "طابع معدني ناصع وأنيق بتدرجات الفضة والكروم المصقول",
+        name = "⚙️ سمة الفضة اللامعة",
+        description = "طابع ناصع وأنيق بتدرجات الفضة والكروم المصقول",
         primaryColor = 0xFF64748B,
         headerBgColor = 0xFFF8FAFC,
         headerTextColor = 0xFF1E293B,
@@ -144,8 +185,23 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_SILVER"
     ),
     AppThemePreset(
-        name = "🛠️ سمة التيتانيوم الصلب الداكن",
-        description = "سمة معدنية ليلية صلبة بخلفية التيتانيوم المسبوك الفاخر",
+        name = "🧱 سمة البرونز والنحاس المعشق",
+        description = "مظهر نحاسي فاخر بالدرجات الأنيقة والدافئة",
+        primaryColor = 0xFFC2410C,
+        headerBgColor = 0xFFFFEDD5,
+        headerTextColor = 0xFF7C2D12,
+        borderColor = 0xFFFB923C,
+        calculatorColor = 0xFF9A3412,
+        activeTabColor = 0xFFEA580C,
+        previewGradient = listOf(0xFFFFEDD5, 0xFFC2410C),
+        isNightMode = false,
+        bgStyle = "METALLIC_COPPER"
+    ),
+
+    // 🌙 NIGHT THEMES (السمات الليلية ثانياً)
+    AppThemePreset(
+        name = "🛠️ سمة التيتانيوم الصلب الداكن (الافتراضي)",
+        description = "السمة الليلية الافتراضية: سمة معدنية صلبة فاخرة بخلفية التيتانيوم المسبوك الفاخر مريحة جداً للعين",
         primaryColor = 0xFF94A3B8,
         headerBgColor = 0xFF0F172A,
         headerTextColor = 0xFFF8FAFC,
@@ -157,17 +213,69 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_TITANIUM"
     ),
     AppThemePreset(
-        name = "🧱 سمة البرونز والنحاس المعشق",
-        description = "مظهر معدني نحاسي فاخر بالدرجات الأنيقة والمعدنية الدافئة",
-        primaryColor = 0xFFC2410C,
-        headerBgColor = 0xFFFFEDD5,
-        headerTextColor = 0xFF7C2D12,
-        borderColor = 0xFFFB923C,
-        calculatorColor = 0xFF9A3412,
-        activeTabColor = 0xFFEA580C,
-        previewGradient = listOf(0xFFFFEDD5, 0xFFC2410C),
-        isNightMode = false,
-        bgStyle = "METALLIC_COPPER"
+        name = "🐅 سمة نادي الاتحاد السعودي (العميد والنمور)",
+        description = "مظهر ليلي كربوني فخم بألوان نادي الاتحاد السعودي: أسود فاحم مع تطعيمات الأصفر والذهبي الملكي",
+        primaryColor = 0xFFFACC15,
+        headerBgColor = 0xFF09090B,
+        headerTextColor = 0xFFFEF08A,
+        borderColor = 0xFFEAB308,
+        calculatorColor = 0xFFCA8A04,
+        activeTabColor = 0xFFEAB308,
+        previewGradient = listOf(0xFF09090B, 0xFFEAB308),
+        isNightMode = true,
+        bgStyle = "TEXTURE_CARBON_FIBER"
+    ),
+    AppThemePreset(
+        name = "🔮 سمة النيون السيبراني الحديث",
+        description = "مظهر ليلي فائق التطور بتدرجات النيون البنفسجي الفوسفوري وأسود الأوليد",
+        primaryColor = 0xFFA855F7,
+        headerBgColor = 0xFF0D0B18,
+        headerTextColor = 0xFFF3E8FF,
+        borderColor = 0xFF9333EA,
+        calculatorColor = 0xFF7E22CE,
+        activeTabColor = 0xFFA855F7,
+        previewGradient = listOf(0xFF0D0B18, 0xFFA855F7),
+        isNightMode = true,
+        bgStyle = "TEXTURE_CARBON_FIBER"
+    ),
+    AppThemePreset(
+        name = "🏎️ سمة كاربون فايبر الرياضي",
+        description = "مظهر ألياف الكربون الرياضية المنسوجة الداكنة بتباين أحمر وفحمي فائق الأناقة",
+        primaryColor = 0xFFEF4444,
+        headerBgColor = 0xFF18181B,
+        headerTextColor = 0xFFF4F4F5,
+        borderColor = 0xFFDC2626,
+        calculatorColor = 0xFF991B1B,
+        activeTabColor = 0xFFEF4444,
+        previewGradient = listOf(0xFF18181B, 0xFFEF4444),
+        isNightMode = true,
+        bgStyle = "TEXTURE_CARBON_FIBER"
+    ),
+    AppThemePreset(
+        name = "💺 سمة الجلد المخرم الفاخر",
+        description = "مظهر الجلد الملكي الفاخر بتخريمات ناعمة وتطريز هافان وأسود أنيق",
+        primaryColor = 0xFFD97706,
+        headerBgColor = 0xFF1C1917,
+        headerTextColor = 0xFFFDE68A,
+        borderColor = 0xFFB45309,
+        calculatorColor = 0xFF78350F,
+        activeTabColor = 0xFFD97706,
+        previewGradient = listOf(0xFF1C1917, 0xFFD97706),
+        isNightMode = true,
+        bgStyle = "TEXTURE_PERFORATED_LEATHER"
+    ),
+    AppThemePreset(
+        name = "🛠️ سمة التيتانيوم الصلب الداكن",
+        description = "سمة ليلية صلبة بخلفية التيتانيوم المسبوك الفاخر",
+        primaryColor = 0xFF94A3B8,
+        headerBgColor = 0xFF0F172A,
+        headerTextColor = 0xFFF8FAFC,
+        borderColor = 0xFF334155,
+        calculatorColor = 0xFF1E293B,
+        activeTabColor = 0xFF64748B,
+        previewGradient = listOf(0xFF0F172A, 0xFF334155),
+        isNightMode = true,
+        bgStyle = "METALLIC_TITANIUM"
     ),
     AppThemePreset(
         name = "👑 سمة الذهب والسبائك الملكية الليلية",
@@ -287,9 +395,9 @@ data class DailyDirectSalesUiState(
     val showDisableReadOnlyConfirmDialog: Boolean = false,
     val showDisableLockGivenExtraConfirmDialog: Boolean = false,
     val showCashRebalanceConfirmDialog: Boolean = false,
-    val isSalesAccordionMode: Boolean = false, // عرض المبيعات كمطوية بدلاً من تبويبات
-    val isCashBoxAccordionMode: Boolean = false, // عرض الصندوق كمطوية بدلاً من تبويبات
-    val isGridViewMode: Boolean = false, // عرض شبكي (Grid View) معطل افتراضياً
+    val selectedThemePresetName: String = "⚙️ سمة الفولاذ المصقول (الافتراضي)", // السمة المطبقة حالياً
+    val appThemeSkin: String = "كلاسيكي (Classic)", // جلد السمة البصري (Skin)
+    val isGridViewEnabled: Boolean = true, // تفعيل العرض الشبكي في الأقسام
     val appBackgroundImageUri: String? = null, // مسار صورة الخلفية المخصصة للمستخدم
     val includeInternetInReport: Boolean = false, // تضمين انترنت في التقرير
     val reportHeaderTitle: String = "البيان المالي",
@@ -316,6 +424,7 @@ data class DailyDirectSalesUiState(
     val reportPrimaryColor: Long = 0xFF1E88E5, // لون التقرير الأساسي
     val reportSecondaryColor: Long = 0xFF455A64, // لون التقرير الثانوي
     val scheduledResetTime: String = "03:00", // وقت التصفير التلقائي اليومي
+    val isAutoDailyResetEnabled: Boolean = true, // تفعيل التصفير التلقائي اليومي
     val dailyReminderEnabled: Boolean = false, // تفعيل تنبيه إغلاق الوردية اليومي
     val dailyReminderTime: String = "22:00", // وقت التنبيه اليومي
     val accountingDayStartHour: Int = 0, // بداية اليوم المحاسبي (0-6 ص لأيام المناسبات وساعات العمل بعد منتصف الليل)
@@ -363,23 +472,11 @@ data class DailyDirectSalesUiState(
             addToBalance = true
         ),
         SalesGroupUiState(
-            id = GROUP_INTERNET_ID,
-            name = "إنترنت",
+            id = GROUP_GAME_CARDS_ID,
+            name = "بطائق ألعاب",
             type = SalesGroupType.DENOMINATIONS,
             isEnabled = false,
             orderIndex = 2,
-            isDefault = true,
-            rows = DEFAULT_INTERNET_CATEGORIES.map { DirectSalesRowUiState(denomination = it) },
-            isExcludedFromBalance = true,
-            addToReport = false,
-            addToBalance = false
-        ),
-        SalesGroupUiState(
-            id = GROUP_GAME_CARDS_ID,
-            name = "بطائق العاب",
-            type = SalesGroupType.DENOMINATIONS,
-            isEnabled = false,
-            orderIndex = 3,
             isDefault = true,
             rows = DEFAULT_GAME_CARDS_CATEGORIES.map { DirectSalesRowUiState(denomination = it) },
             isExcludedFromBalance = false,
@@ -391,12 +488,24 @@ data class DailyDirectSalesUiState(
             name = "شرابات",
             type = SalesGroupType.DENOMINATIONS,
             isEnabled = false,
-            orderIndex = 4,
+            orderIndex = 3,
             isDefault = true,
             rows = DEFAULT_SHARABAT_CATEGORIES.map { DirectSalesRowUiState(denomination = it) },
             isExcludedFromBalance = false,
             addToReport = true,
             addToBalance = true
+        ),
+        SalesGroupUiState(
+            id = GROUP_INTERNET_ID,
+            name = "انترنت",
+            type = SalesGroupType.DENOMINATIONS,
+            isEnabled = false,
+            orderIndex = 4,
+            isDefault = true,
+            rows = DEFAULT_INTERNET_CATEGORIES.map { DirectSalesRowUiState(denomination = it) },
+            isExcludedFromBalance = true,
+            addToReport = false,
+            addToBalance = false
         )
     ),
     val selectedGroupId: String = GROUP_SANAD_ID,
@@ -478,13 +587,13 @@ data class DailyDirectSalesUiState(
     val inactiveTabColor: Long = 0xFF64748B,
     val calculatorButtonColor: Long = 0xFF1E88E5,
     val calculatorBgColor: Long = 0xFF1E293B,
-    val showRemainingStepper: Boolean = false, // زرّا زيادة (+1) وإنقاص (-1) للمتبقي
+    val showRemainingStepper: Boolean = true, // زرّا زيادة (+1) وإنقاص (-1) للمتبقي
+    val showBudgetSummaryBar: Boolean = true, // شريط حالة ملخص الميزانية في الأعلى
     val showMaintenanceDialog: Boolean = false, // إظهار نافذة الصيانة
     val maintenanceResults: List<String> = emptyList(), // نتائج الصيانة والتصحيح التلقائي
     val isMaintenanceRunning: Boolean = false, // هل فحص الصيانة جاري حالياً؟
     val shiftReminderEnabled: Boolean = false, // تفعيل التنبيه اليومي لإغلاق الوردية
     val shiftReminderTime: String = "21:00", // وقت التنبيه اليومي
-    val isGridViewEnabled: Boolean = false, // عرض الشبكة (Grid View) معطل افتراضياً
     val customBackgroundImageUri: String? = null, // صورة خلفية مخصصة من الجهاز
     val customBackgroundOpacity: Float = 0.85f, // شفافية صورة الخلفية
     val isGlobalAddedFieldActive: Boolean = false, // زر الإضافي في قسم المبيعات
@@ -521,20 +630,95 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     private val _customDayPrimary = MutableStateFlow<Color?>(null)
     val customDayPrimary: StateFlow<Color?> = _customDayPrimary.asStateFlow()
 
+    // Calculated summary of all groups
+    val salesSummary: StateFlow<DailySalesSummary> = combine(_uiState, _uiState) { state, _ ->
+        calculateSalesSummary(state)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = DailySalesSummary()
+    )
+
+    // Group breakdown report
+    val groupReports: StateFlow<List<GroupReportItem>> = combine(_uiState, salesSummary) { state, _ ->
+        val activeGroups = state.groups.filter { grp ->
+            grp.isEnabled && (state.includeInternetInReport || (grp.id != GROUP_INTERNET_ID && !grp.name.contains("انترنت")))
+        }
+        val totalAllSales = activeGroups.sumOf { it.totalRevenue }
+        activeGroups.map { group ->
+            val rev = group.totalRevenue
+            val percentage = if (totalAllSales > 0) (rev / totalAllSales) * 100 else 0.0
+            val count = when (group.type) {
+                SalesGroupType.DENOMINATIONS, SalesGroupType.CUSTOM_FIELDS -> group.activeRows.sumOf { it.sold }
+                SalesGroupType.DIRECT_ENTRY -> group.directEntries.count { it.isFilled }
+            }
+            GroupReportItem(
+                groupId = group.id,
+                groupName = group.name,
+                type = group.type,
+                isEnabled = group.isEnabled,
+                totalRevenue = rev,
+                totalItemsOrTickets = count,
+                percentageOfRevenue = percentage
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    // Category breakdown report
+    val categoryReports: StateFlow<List<CategoryReportItem>> = combine(_uiState, salesSummary) { state, _ ->
+        val result = mutableListOf<CategoryReportItem>()
+        val activeGroups = state.groups.filter { it.isEnabled && (it.type == SalesGroupType.DENOMINATIONS || it.type == SalesGroupType.CUSTOM_FIELDS) }
+        val totalAllSales = activeGroups.sumOf { it.totalRevenue }
+        for (group in activeGroups) {
+            // Always show all rows for enabled groups in the report breakdown as requested
+            val rowsToInclude = group.rows 
+            for (row in rowsToInclude) {
+                val percentage = if (totalAllSales > 0) (row.total / totalAllSales) * 100 else 0.0
+                result.add(
+                    CategoryReportItem(
+                        denomination = row.denomination,
+                        totalGiven = row.given,
+                        totalAdded = row.added,
+                        totalRemaining = row.remaining,
+                        totalSold = row.sold,
+                        totalRevenue = row.total,
+                        groupName = group.name,
+                        notes = row.notes,
+                        percentageOfRevenue = percentage
+                    )
+                )
+            }
+        }
+        result.sortedBy { it.denomination }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
     init {
         val db = AppDatabase.getDatabase(application)
         repository = DailySalesRepository(db.dailySalesDao())
         
-        val initialSalesAcc = sharedPreferences.getBoolean("isSalesAccordionMode", false)
-        val initialCashAcc = sharedPreferences.getBoolean("isCashBoxAccordionMode", false)
+        val initialThemePreset = sharedPreferences.getString("selectedThemePresetName", "⚙️ سمة الفولاذ المصقول (الافتراضي)") ?: "⚙️ سمة الفولاذ المصقول (الافتراضي)"
         val initialHijriAdj = sharedPreferences.getInt("hijriAdjustmentDays", 0)
-        val initialRemainingStepper = sharedPreferences.getBoolean("showRemainingStepper", false)
+        val initialRemainingStepper = sharedPreferences.getBoolean("showRemainingStepper", true)
+        val initialBudgetSummaryBar = sharedPreferences.getBoolean("showBudgetSummaryBar", true)
         val initialShiftReminder = sharedPreferences.getBoolean("shiftReminderEnabled", false)
         val initialShiftReminderTime = sharedPreferences.getString("shiftReminderTime", "21:00") ?: "21:00"
-        val initialGridView = sharedPreferences.getBoolean("isGridViewMode", true)
         val initialCompact = sharedPreferences.getBoolean("showCompactMode", false)
         val initialIsDayClosed = sharedPreferences.getBoolean("is_day_closed", false)
         val initialClosedDayTs = sharedPreferences.getLong("closed_day_timestamp", 0L)
+        val initialScheduledResetTime = sharedPreferences.getString("scheduledResetTime", "03:00") ?: "03:00"
+        val initialAccountingDayStartHour = sharedPreferences.getInt("accountingDayStartHour", 0)
+        val initialIsAutoDailyResetEnabled = sharedPreferences.getBoolean("isAutoDailyResetEnabled", true)
+        val initialTableCardAlpha = sharedPreferences.getFloat("tableCardAlpha", 1.0f)
+        val initialTableHeaderAlpha = sharedPreferences.getFloat("tableHeaderAlpha", 1.0f)
+        val initialTableCellAlpha = sharedPreferences.getFloat("tableCellAlpha", 1.0f)
         
         val initialSymbolPos = sharedPreferences.getString("currency_symbol_position", "AUTO") ?: "AUTO"
         val initialDecimalMode = sharedPreferences.getString("currency_decimal_mode", "AUTO") ?: "AUTO"
@@ -549,19 +733,27 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         val loadedCurrs = loadCurrenciesFromPrefs()
         _uiState.update { state ->
             val nextState = state.copy(
-                isSalesAccordionMode = initialSalesAcc,
-                isCashBoxAccordionMode = initialCashAcc,
+                selectedThemePresetName = initialThemePreset,
                 hijriAdjustmentDays = initialHijriAdj,
                 showRemainingStepper = initialRemainingStepper,
+                showBudgetSummaryBar = initialBudgetSummaryBar,
                 shiftReminderEnabled = initialShiftReminder,
                 shiftReminderTime = initialShiftReminderTime,
                 showCompactMode = initialCompact,
                 isDayClosed = initialIsDayClosed,
                 closedDayTimestamp = initialClosedDayTs,
+                scheduledResetTime = initialScheduledResetTime,
+                accountingDayStartHour = initialAccountingDayStartHour,
+                isAutoDailyResetEnabled = initialIsAutoDailyResetEnabled,
                 currencySymbolPosition = initialSymbolPos,
                 currencyDecimalMode = initialDecimalMode,
                 currencyThousandsSeparator = initialThousandsSep,
-                currencyDisplayType = initialDisplayType
+                currencyDisplayType = initialDisplayType,
+                customColorThemeState = state.customColorThemeState.copy(
+                    tableCardAlpha = initialTableCardAlpha,
+                    tableHeaderAlpha = initialTableHeaderAlpha,
+                    tableCellAlpha = initialTableCellAlpha
+                )
             )
             if (loadedCurrs != null) {
                 val main = loadedCurrs.find { it.isMain }
@@ -576,6 +768,8 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                 nextState
             }
         }
+
+        startAutoResetMonitor()
 
         // Collect daily report archives
         viewModelScope.launch {
@@ -868,45 +1062,45 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                 isExcludedFromBalance = false
             ),
             SalesGroupUiState(
-                id = GROUP_GAME_CARDS_ID,
-                name = "بطائق العاب",
-                type = SalesGroupType.DENOMINATIONS,
+                id = GROUP_CHINI_ID,
+                name = "صيني",
+                type = SalesGroupType.DIRECT_ENTRY,
                 isEnabled = false,
                 orderIndex = 1,
+                isDefault = true,
+                directEntries = emptyList(),
+                isExcludedFromBalance = false
+            ),
+            SalesGroupUiState(
+                id = GROUP_GAME_CARDS_ID,
+                name = "بطائق ألعاب",
+                type = SalesGroupType.DENOMINATIONS,
+                isEnabled = false,
+                orderIndex = 2,
                 isDefault = true,
                 isAddedFieldEnabled = false,
                 rows = DEFAULT_GAME_CARDS_CATEGORIES.map { DirectSalesRowUiState(denomination = it) },
                 isExcludedFromBalance = false
             ),
             SalesGroupUiState(
-                id = GROUP_CHINI_ID,
-                name = "صيني",
-                type = SalesGroupType.DIRECT_ENTRY,
-                isEnabled = false,
-                orderIndex = 2,
-                isDefault = true,
-                directEntries = emptyList(),
-                isExcludedFromBalance = false
-            ),
-            SalesGroupUiState(
-                id = GROUP_INTERNET_ID,
-                name = "إنترنت",
-                type = SalesGroupType.DENOMINATIONS,
-                isEnabled = false,
-                orderIndex = 3,
-                isDefault = true,
-                rows = DEFAULT_INTERNET_CATEGORIES.map { DirectSalesRowUiState(denomination = it) },
-                isExcludedFromBalance = true
-            ),
-            SalesGroupUiState(
                 id = GROUP_SHARABAT_ID,
                 name = "شرابات",
                 type = SalesGroupType.DENOMINATIONS,
                 isEnabled = false,
-                orderIndex = 4,
+                orderIndex = 3,
                 isDefault = true,
                 rows = DEFAULT_SHARABAT_CATEGORIES.map { DirectSalesRowUiState(denomination = it) },
                 isExcludedFromBalance = false
+            ),
+            SalesGroupUiState(
+                id = GROUP_INTERNET_ID,
+                name = "انترنت",
+                type = SalesGroupType.DENOMINATIONS,
+                isEnabled = false,
+                orderIndex = 4,
+                isDefault = true,
+                rows = DEFAULT_INTERNET_CATEGORIES.map { DirectSalesRowUiState(denomination = it) },
+                isExcludedFromBalance = true
             )
         )
 
@@ -961,231 +1155,16 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun onSplashFinished() {
-        _currentScreen.value = AppScreen.DIRECT_SALES
+        _currentScreen.value = AppScreen.HOME
     }
 
     fun openOnboarding() {
-        _currentScreen.value = AppScreen.DIRECT_SALES
+        _currentScreen.value = AppScreen.HOME
     }
 
     fun finishOnboarding() {
-        _currentScreen.value = AppScreen.DIRECT_SALES
+        _currentScreen.value = AppScreen.HOME
     }
-
-    // Calculated summary of all groups
-    val salesSummary: StateFlow<DailySalesSummary> = combine(_uiState, _uiState) { state, _ ->
-        var totalGiven = 0
-        var totalAdded = 0
-        var totalRemaining = 0
-        var totalSold = 0
-        var totalRevenue = 0.0
-        var sideInternetRevenue = 0.0
-        var totalSideRevenue = 0.0
-        var hasErrors = false
-
-        val activeGroups = state.groups.filter { grp ->
-            grp.isEnabled && (state.includeInternetInReport || (grp.id != GROUP_INTERNET_ID && !grp.name.contains("انترنت")))
-        }
-
-        for (group in activeGroups) {
-            if (group.isExcludedFromBalance) {
-                totalSideRevenue += group.totalRevenue
-                if (group.id == GROUP_INTERNET_ID) {
-                    sideInternetRevenue += group.totalRevenue
-                }
-            } else {
-                totalRevenue += group.totalRevenue
-            }
-
-            val isSanadGroup = group.id == GROUP_SANAD_ID || group.name == "سند"
-            val isChiniGroup = group.id == GROUP_CHINI_ID || group.name.contains("صيني")
-            when (group.type) {
-                SalesGroupType.DENOMINATIONS, SalesGroupType.CUSTOM_FIELDS -> {
-                    for (row in group.activeRows) {
-                        if (!isChiniGroup) {
-                            totalGiven += row.given
-                            totalAdded += row.added
-                            totalRemaining += row.remaining
-                            if (isSanadGroup) {
-                                totalSold += row.sold
-                            }
-                        }
-                        if (row.isRemainingExceeded) {
-                            hasErrors = true
-                        }
-                    }
-                }
-                SalesGroupType.DIRECT_ENTRY -> {
-                    if (!isChiniGroup && isSanadGroup) {
-                        for (entry in group.directEntries) {
-                            if (entry.isFilled) totalSold += 1
-                        }
-                    }
-                }
-            }
-        }
-
-        val cashYer = state.cashInBoxYerInput.trim().toDoubleOrNull() ?: 0.0
-        val cashSar = state.cashInBoxSarInput.trim().toDoubleOrNull() ?: 0.0
-        val exchangeRate = state.exchangeRateInput.trim().toDoubleOrNull()?.takeIf { it > 0 } ?: 380.0
-
-        val cashGroupsCashTotal = state.cashGroups
-            .filter { it.isEnabled && !it.isExcludedFromBalance && it.id != CASH_GROUP_MAIN_ID && (it.type == CashGroupType.DENOMINATIONS || it.type == CashGroupType.DIRECT_ENTRY) }
-            .filter { group ->
-                if (group.type == CashGroupType.DENOMINATIONS) state.showCashDenominationsTable else true
-            }
-            .sumOf { it.getTotalYer(exchangeRate, cashYer) }
-
-        val isExpensesGroupEnabled = state.cashGroups.find { it.type == CashGroupType.EXPENSES || it.id == CASH_GROUP_EXPENSES_ID }?.isEnabled ?: false
-        val isDepositsGroupEnabled = state.cashGroups.find { it.type == CashGroupType.DEPOSITS || it.id == "cash_group_deposits" }?.isEnabled ?: false
-
-        val cashGroupsExpensesTotal = if (isExpensesGroupEnabled) {
-            state.cashGroups
-                .filter { it.isEnabled && !it.isExcludedFromBalance && it.type == CashGroupType.EXPENSES }
-                .sumOf { it.getTotalYer(exchangeRate) }
-        } else 0.0
-
-        val cashGroupsDepositsTotal = if (isDepositsGroupEnabled) {
-            state.cashGroups
-                .filter { it.isEnabled && !it.isExcludedFromBalance && it.type == CashGroupType.DEPOSITS }
-                .sumOf { it.getTotalYer(exchangeRate) }
-        } else 0.0
-
-        val expensesList = if (isExpensesGroupEnabled) state.expenses.filter { !it.isDeposit } else emptyList()
-        val depositsList = if (isDepositsGroupEnabled) state.expenses.filter { it.isDeposit } else emptyList()
-
-        val totalExpensesYer = expensesList.filter { !it.isSar }.sumOf { it.amount }
-        val totalExpensesSar = expensesList.filter { it.isSar }.sumOf { it.amount }
-        val totalExpensesInYer = expensesList.sumOf { it.getTotalYer(exchangeRate) } + cashGroupsExpensesTotal
-
-        // Only expenses actually deducted from physical cash are added back to reconstruct gross receipts
-        val deductedExpensesInYer = expensesList.filter { it.deductFromCash && !it.isSuspended }.sumOf { it.getTotalYer(exchangeRate) } + cashGroupsExpensesTotal
-
-        val totalDepositsYer = depositsList.filter { !it.isSar }.sumOf { it.amount }
-        val totalDepositsSar = depositsList.filter { it.isSar }.sumOf { it.amount }
-        val totalDepositsInYer = depositsList.sumOf { it.getTotalYer(exchangeRate) } + cashGroupsDepositsTotal
-
-        // صندوق النقد الفعلي (Physical Cash) = المبلغ النقدي بالريال اليمني + المعادل بالريال السعودي + بقية فئات النقد
-        val physicalCashInBox = (cashYer + (cashSar * exchangeRate) + cashGroupsCashTotal).coerceAtLeast(0.0)
-        
-        // إجمالي العملات الأخرى
-        val otherCurrenciesTotalYer = (cashSar * exchangeRate) + cashGroupsCashTotal
-
-        // النقد الصافي بالريال اليمني
-        val netCashYer = cashYer.coerceAtLeast(0.0)
-
-        // الصندوق = (النقد + المصاريف + العملات + الإيداعات)
-        val cashAmount = cashYer.coerceAtLeast(0.0)
-        val expensesAmount = totalExpensesInYer
-        val currenciesAmount = (cashSar * exchangeRate) + cashGroupsCashTotal
-        val depositsAmount = totalDepositsInYer
-
-        // إجمالي الصندوق المحاسبي = (النقد + المصاريف + العملات + الإيداعات)
-        val totalBoxAmount = cashAmount + expensesAmount + currenciesAmount + depositsAmount
-        val grossCashInBox = totalBoxAmount
-
-        // الفارق / الموازنة المحاسبية = الصندوق (النقد + المصاريف + العملات + الإيداعات) - المبيعات
-        val balance = totalBoxAmount - totalRevenue
-
-        val balanceStatus = when {
-            abs(balance) < 0.001 -> BalanceStatus.MATCHED
-            balance > 0.001 -> BalanceStatus.SURPLUS
-            else -> BalanceStatus.DEFICIT
-        }
-
-        DailySalesSummary(
-            totalGiven = totalGiven,
-            totalAdded = totalAdded,
-            totalRemaining = totalRemaining,
-            totalSold = totalSold,
-            totalRevenue = totalRevenue,
-            sideInternetRevenue = sideInternetRevenue,
-            totalSideRevenue = totalSideRevenue,
-            cashInBoxYer = cashYer,
-            cashInBoxSar = cashSar,
-            netCashYer = netCashYer,
-            exchangeRateSarToYer = exchangeRate,
-            totalExpensesYer = totalExpensesYer,
-            totalExpensesSar = totalExpensesSar,
-            totalExpensesInYer = totalExpensesInYer,
-            totalDepositsYer = totalDepositsYer,
-            totalDepositsSar = totalDepositsSar,
-            totalDepositsInYer = totalDepositsInYer,
-            otherCurrenciesTotalYer = otherCurrenciesTotalYer,
-            grossCashInBox = grossCashInBox,
-            cashInBox = physicalCashInBox,
-            balance = balance,
-            balanceStatus = balanceStatus,
-            hasErrors = hasErrors,
-            activeGroupsCount = activeGroups.size,
-            totalGroupsCount = state.groups.size
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = DailySalesSummary()
-    )
-
-    // Group breakdown report
-    val groupReports: StateFlow<List<GroupReportItem>> = combine(_uiState, salesSummary) { state, _ ->
-        val activeGroups = state.groups.filter { grp ->
-            grp.isEnabled && (state.includeInternetInReport || (grp.id != GROUP_INTERNET_ID && !grp.name.contains("انترنت")))
-        }
-        val totalAllSales = activeGroups.sumOf { it.totalRevenue }
-        activeGroups.map { group ->
-            val rev = group.totalRevenue
-            val percentage = if (totalAllSales > 0) (rev / totalAllSales) * 100 else 0.0
-            val count = when (group.type) {
-                SalesGroupType.DENOMINATIONS, SalesGroupType.CUSTOM_FIELDS -> group.activeRows.sumOf { it.sold }
-                SalesGroupType.DIRECT_ENTRY -> group.directEntries.count { it.isFilled }
-            }
-            GroupReportItem(
-                groupId = group.id,
-                groupName = group.name,
-                type = group.type,
-                isEnabled = group.isEnabled,
-                totalRevenue = rev,
-                totalItemsOrTickets = count,
-                percentageOfRevenue = percentage
-            )
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
-
-    // Category breakdown report
-    val categoryReports: StateFlow<List<CategoryReportItem>> = combine(_uiState, salesSummary) { state, _ ->
-        val result = mutableListOf<CategoryReportItem>()
-        val activeGroups = state.groups.filter { it.isEnabled && (it.type == SalesGroupType.DENOMINATIONS || it.type == SalesGroupType.CUSTOM_FIELDS) }
-        val totalAllSales = activeGroups.sumOf { it.totalRevenue }
-        for (group in activeGroups) {
-            // Always show all rows for enabled groups in the report breakdown as requested
-            val rowsToInclude = group.rows 
-            for (row in rowsToInclude) {
-                val percentage = if (totalAllSales > 0) (row.total / totalAllSales) * 100 else 0.0
-                result.add(
-                    CategoryReportItem(
-                        denomination = row.denomination,
-                        totalGiven = row.given,
-                        totalAdded = row.added,
-                        totalRemaining = row.remaining,
-                        totalSold = row.sold,
-                        totalRevenue = row.total,
-                        groupName = group.name,
-                        notes = row.notes,
-                        percentageOfRevenue = percentage
-                    )
-                )
-            }
-        }
-        result.sortedBy { it.denomination }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
 
     fun navigateTo(screen: AppScreen) {
         _currentScreen.value = screen
@@ -1276,6 +1255,14 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
             val newValue = !state.showRemainingStepper
             sharedPreferences.edit().putBoolean("showRemainingStepper", newValue).apply()
             state.copy(showRemainingStepper = newValue)
+        }
+    }
+
+    fun toggleBudgetSummaryBar() {
+        _uiState.update { state ->
+            val newValue = !state.showBudgetSummaryBar
+            sharedPreferences.edit().putBoolean("showBudgetSummaryBar", newValue).apply()
+            state.copy(showBudgetSummaryBar = newValue)
         }
     }
 
@@ -1514,12 +1501,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         saveToDatabase()
     }
 
-    fun setGridViewEnabled(enabled: Boolean) {
-        _uiState.update { it.copy(isGridViewEnabled = enabled) }
-        sharedPreferences.edit().putBoolean("isGridViewEnabled", enabled).apply()
-        addAuditLog("التخطيط", "عرض الشبكة", if (enabled) "تفعيل" else "تعطيل", "", "")
-        saveToDatabase()
-    }
+
 
     fun toggleGlobalAddedField() {
         _uiState.update { state ->
@@ -2093,6 +2075,12 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
 
     fun setScheduledResetTime(time: String) {
         _uiState.update { it.copy(scheduledResetTime = time) }
+        sharedPreferences.edit().putString("scheduledResetTime", time).apply()
+    }
+
+    fun setAutoDailyResetEnabled(enabled: Boolean) {
+        _uiState.update { it.copy(isAutoDailyResetEnabled = enabled) }
+        sharedPreferences.edit().putBoolean("isAutoDailyResetEnabled", enabled).apply()
     }
 
     fun setDailyReminderEnabled(enabled: Boolean) {
@@ -2107,6 +2095,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
 
     fun setAccountingDayStartHour(hour: Int) {
         _uiState.update { it.copy(accountingDayStartHour = hour) }
+        sharedPreferences.edit().putInt("accountingDayStartHour", hour).apply()
     }
 
     fun setReportPrimaryColor(colorLong: Long) {
@@ -2252,36 +2241,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         saveToDatabase()
     }
 
-    fun commitSalesFromCalculator(
-        groupId: String,
-        targetField: com.example.ui.components.CalculatorTargetField,
-        quantities: Map<Int, Int>
-    ) {
-        if (checkDayClosedAndWarn()) return
-        val group = _uiState.value.groups.find { it.id == groupId } ?: return
-        _uiState.update { state ->
-            val updatedGroups = state.groups.map { grp ->
-                if (grp.id == groupId) {
-                    val updatedRows = grp.rows.map { r ->
-                        val qty = quantities[r.denomination]
-                        if (qty != null) {
-                            val strVal = if (qty > 0) qty.toString() else ""
-                            when (targetField) {
-                                com.example.ui.components.CalculatorTargetField.GIVEN -> r.copy(givenInput = strVal)
-                                com.example.ui.components.CalculatorTargetField.ADDED -> r.copy(addedInput = strVal)
-                                com.example.ui.components.CalculatorTargetField.REMAINING -> r.copy(remainingInput = strVal)
-                            }
-                        } else r
-                    }
-                    grp.copy(rows = updatedRows)
-                } else grp
-            }
-            state.copy(groups = updatedGroups)
-        }
-        addAuditLog("المبيعات", group.name, "اعتماد إدخال من الآلة الحاسبة (${targetField.label})", "", "")
-        saveToDatabase()
-    }
-
     // Update Remaining with smooth, non-blocking entry & strict validation against given+added
     fun updateRemaining(groupId: String, denomination: Int, remaining: String) {
         if (checkDayClosedAndWarn()) return
@@ -2295,7 +2254,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
             if (parsedRemaining > totalGivenAndAdded) {
                 _uiState.update { state ->
                     state.copy(
-                        remainingWarningMessage = "لا تقبل قيمة المتبقي ($parsedRemaining) لأنها أكبر من مجموع (المعطى + الإضافي = $totalGivenAndAdded)! تم العودة للقيمة السابقة."
+                        remainingWarningMessage = "لا تقبل قيمة المتبقي ($parsedRemaining) لأنها أكبر من مجموع المخزون (المعطى + الإضافي = $totalGivenAndAdded)! يرجى التحقق من المدخلات."
                     )
                 }
                 return // Reject edit and keep previous value
@@ -3658,8 +3617,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                     state.copy(
                         groups = updatedGroups,
                         cashGroups = updatedCashGroups,
-                        isSalesAccordionMode = false,
-                        isCashBoxAccordionMode = false,
                         activePresetId = "standard_full"
                     )
                 }
@@ -3682,7 +3639,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                     state.copy(
                         groups = updatedGroups,
                         cashGroups = updatedCashGroups,
-                        isSalesAccordionMode = false,
                         activePresetId = "fast_tickets"
                     )
                 }
@@ -3701,26 +3657,13 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                 addAuditLog("الإدارة", "تطبيق الوضع", "وضع المحاسب والتدقيق المالي", "", "")
                 saveToDatabase()
             }
-            "accordion_layout" -> {
-                _uiState.update { state ->
-                    state.copy(
-                        isSalesAccordionMode = true,
-                        isCashBoxAccordionMode = true,
-                        activePresetId = "accordion_layout"
-                    )
-                }
-                addAuditLog("الإدارة", "تغيير نمط العرض", "نمط المطويات المفتوحة", "", "")
-                saveToDatabase()
-            }
             "compact_tabs" -> {
                 _uiState.update { state ->
                     state.copy(
-                        isSalesAccordionMode = false,
-                        isCashBoxAccordionMode = false,
                         activePresetId = "compact_tabs"
                     )
                 }
-                addAuditLog("الإدارة", "تغيير نمط العرض", "نمط التبويبات المدمجة", "", "")
+                addAuditLog("الإدارة", "تطبيق الوضع", "نمط التبويبات المدمجة", "", "")
                 saveToDatabase()
             }
         }
@@ -3870,6 +3813,124 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         }
         addAuditLog("الوردية", "تصفير الوردية", "تصفير شامل للوردية وحفظ الأرشيف: ${shiftNotes.ifBlank { "بدون ملاحظات" }}", "", "0")
         saveToDatabase()
+    }
+
+    private var autoResetMonitorJob: kotlinx.coroutines.Job? = null
+
+    fun getEffectiveAccountingDayTimestamp(startHour: Int = _uiState.value.accountingDayStartHour): Long {
+        val cal = java.util.Calendar.getInstance()
+        if (cal.get(java.util.Calendar.HOUR_OF_DAY) < startHour) {
+            cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
+        }
+        cal.set(java.util.Calendar.HOUR_OF_DAY, startHour)
+        cal.set(java.util.Calendar.MINUTE, 0)
+        cal.set(java.util.Calendar.SECOND, 0)
+        cal.set(java.util.Calendar.MILLISECOND, 0)
+        return cal.timeInMillis
+    }
+
+    private fun startAutoResetMonitor() {
+        autoResetMonitorJob?.cancel()
+        autoResetMonitorJob = viewModelScope.launch {
+            while (coroutineContext.isActive) {
+                try {
+                    checkAndPerformAutoResetIfNeeded(forceManual = false)
+                } catch (_: Exception) {}
+                kotlinx.coroutines.delay(45_000L) // فحص كل 45 ثانية
+            }
+        }
+    }
+
+    fun triggerManualAutoResetTest() {
+        checkAndPerformAutoResetIfNeeded(forceManual = true)
+    }
+
+    fun checkAndPerformAutoResetIfNeeded(forceManual: Boolean = false) {
+        val isEnabled = sharedPreferences.getBoolean("isAutoDailyResetEnabled", true)
+        if (!isEnabled && !forceManual) return
+
+        val scheduledTime = _uiState.value.scheduledResetTime.ifBlank { "03:00" }
+        val timeParts = scheduledTime.split(":")
+        val resetHour = timeParts.getOrNull(0)?.toIntOrNull() ?: 3
+        val resetMinute = timeParts.getOrNull(1)?.toIntOrNull() ?: 0
+
+        val cal = java.util.Calendar.getInstance()
+        val nowHour = cal.get(java.util.Calendar.HOUR_OF_DAY)
+        val nowMinute = cal.get(java.util.Calendar.MINUTE)
+
+        val accountingDayTs = getEffectiveAccountingDayTimestamp(_uiState.value.accountingDayStartHour)
+        val todayDateString = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ENGLISH).format(java.util.Date(accountingDayTs))
+        val lastResetDate = sharedPreferences.getString("last_auto_reset_accounting_date", "") ?: ""
+
+        val timeReached = nowHour > resetHour || (nowHour == resetHour && nowMinute >= resetMinute)
+        val shouldTrigger = forceManual || (timeReached && lastResetDate != todayDateString)
+
+        if (shouldTrigger) {
+            sharedPreferences.edit().putString("last_auto_reset_accounting_date", todayDateString).apply()
+            confirmAndResetShift("تصفير تلقائي مجدول لبداية اليوم المحاسبي (${scheduledTime})")
+            _uiState.update { it.copy(shiftResetSuccessBannerMessage = "تم التصفير التلقائي اليومي بنجاح وبداية يوم محاسبي جديد ✨") }
+        }
+    }
+
+    // اعتماد بيع الأصناف المختارة من الآلة الحاسبة مرة واحدة
+    fun commitSalesFromCalculator(quantitiesMap: Map<String, String>) {
+        if (quantitiesMap.isEmpty()) return
+
+        var totalCommittedRevenue = 0.0
+        var totalCommittedTickets = 0
+
+        _uiState.update { state ->
+            val updatedGroups = state.groups.map { grp ->
+                if (grp.type == SalesGroupType.DIRECT_ENTRY) {
+                    val amountStr = quantitiesMap["${grp.id}_amount"] ?: ""
+                    val amountVal = amountStr.toDoubleOrNull() ?: 0.0
+                    if (amountVal > 0) {
+                        totalCommittedRevenue += amountVal
+                        val newItem = DirectEntryItem(
+                            title = "مبيعات صيني - حاسبة الفئات",
+                            amountInput = amountStr,
+                            quantityInput = "1",
+                            notes = "اعتماد مبيعات بالآلة الحاسبة"
+                        )
+                        grp.copy(directEntries = grp.directEntries + newItem, isEnabled = true)
+                    } else {
+                        grp
+                    }
+                } else {
+                    var hasRowChange = false
+                    val updatedRows = grp.rows.map { row ->
+                        val qtyStr = quantitiesMap["${grp.id}_${row.denomination}"] ?: ""
+                        val qty = qtyStr.toIntOrNull() ?: 0
+                        if (qty > 0) {
+                            hasRowChange = true
+                            totalCommittedTickets += qty
+                            totalCommittedRevenue += (qty * row.denomination).toDouble()
+
+                            val currentGiven = row.given
+                            val currentAdded = row.added
+                            val effectiveGiven = if (currentGiven == 0 && currentAdded == 0) qty else currentGiven
+                            val newRemaining = (effectiveGiven + currentAdded - (row.sold + qty)).coerceAtLeast(0)
+
+                            row.copy(
+                                givenInput = if (currentGiven == 0 && currentAdded == 0) qty.toString() else row.givenInput,
+                                remainingInput = newRemaining.toString()
+                            )
+                        } else {
+                            row
+                        }
+                    }
+                    if (hasRowChange) grp.copy(rows = updatedRows, isEnabled = true) else grp
+                }
+            }
+
+            state.copy(
+                groups = updatedGroups,
+                shiftResetSuccessBannerMessage = "تم اعتماد بيع الأصناف بنجاح! الإجمالي: ${AccountingFormatter.formatYer(totalCommittedRevenue)} ريال ($totalCommittedTickets تذكرة) ✨"
+            )
+        }
+
+        saveToDatabase()
+        addAuditLog("الآلة الحاسبة", "اعتماد مبيعات", "تم اعتماد مبيعات إجمالية: ${AccountingFormatter.formatYer(totalCommittedRevenue)} ريال", "", "")
     }
 
     // Reset all groups and denominations
@@ -4284,27 +4345,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     }
 
     // Theme Customization
-    fun toggleSalesAccordionMode(enabled: Boolean) {
-        _uiState.update { it.copy(isSalesAccordionMode = enabled) }
-        sharedPreferences.edit().putBoolean("isSalesAccordionMode", enabled).apply()
-        addAuditLog("العرض", "مطوية المبيعات", if (enabled) "تفعيل وضع المطوية للمبيعات" else "تفعيل وضع التبويبات للمبيعات", "", "")
-        saveToDatabase()
-    }
-
-    fun toggleCashBoxAccordionMode(enabled: Boolean) {
-        _uiState.update { it.copy(isCashBoxAccordionMode = enabled) }
-        sharedPreferences.edit().putBoolean("isCashBoxAccordionMode", enabled).apply()
-        addAuditLog("العرض", "مطوية الصندوق", if (enabled) "تفعيل وضع المطوية للصندوق" else "تفعيل وضع التبويبات للصندوق", "", "")
-        saveToDatabase()
-    }
-
-    fun toggleGridViewMode(enabled: Boolean) {
-        _uiState.update { it.copy(isGridViewMode = enabled) }
-        sharedPreferences.edit().putBoolean("isGridViewMode", enabled).apply()
-        addAuditLog("التخطيط", "العرض الشبكي", if (enabled) "تفعيل العرض الشبكي" else "تعطيل العرض الشبكي", "", "")
-        saveToDatabase()
-    }
-
     fun setAppBackgroundImageUri(uri: String?) {
         _uiState.update { it.copy(appBackgroundImageUri = uri, appBackgroundStyle = if (uri != null) "CUSTOM_IMAGE" else it.appBackgroundStyle) }
         sharedPreferences.edit().putString("appBackgroundImageUri", uri ?: "").apply()
@@ -4418,6 +4458,20 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         saveToDatabase()
     }
 
+    fun setAppThemeSkin(skin: String) {
+        _uiState.update { it.copy(appThemeSkin = skin) }
+        sharedPreferences.edit().putString("appThemeSkin", skin).apply()
+        addAuditLog("المظهر", "جلد السمة", "تغيير جلد السمة البصري: $skin", "", "")
+        saveToDatabase()
+    }
+
+    fun setGridViewEnabled(enabled: Boolean) {
+        _uiState.update { it.copy(isGridViewEnabled = enabled) }
+        sharedPreferences.edit().putBoolean("isGridViewEnabled", enabled).apply()
+        addAuditLog("التخطيط", "العرض الشبكي", if (enabled) "تفعيل" else "إيقاف", "", "")
+        saveToDatabase()
+    }
+
     fun applyThemePreset(preset: AppThemePreset) {
         val pColor = Color(preset.primaryColor)
         if (preset.isNightMode) {
@@ -4429,6 +4483,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         }
         _uiState.update { s ->
             s.copy(
+                selectedThemePresetName = preset.name,
                 reportPrimaryColor = preset.primaryColor,
                 tableHeaderBgColor = preset.headerBgColor,
                 tableHeaderTextColor = preset.headerTextColor,
@@ -4439,6 +4494,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
             )
         }
         sharedPreferences.edit()
+            .putString("selectedThemePresetName", preset.name)
             .putLong("custom_day_primary", if (!preset.isNightMode) preset.primaryColor else (_customDayPrimary.value?.toArgb()?.toLong() ?: preset.primaryColor))
             .putLong("custom_night_primary", if (preset.isNightMode) preset.primaryColor else (_customNightPrimary.value?.toArgb()?.toLong() ?: preset.primaryColor))
             .putLong("reportPrimaryColor", preset.primaryColor)
@@ -4450,6 +4506,16 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
             .putString("appBackgroundStyle", if (preset.bgStyle.isNotBlank()) preset.bgStyle else _uiState.value.appBackgroundStyle)
             .apply()
         addAuditLog("الإعدادات", "تغيير السمة", "تطبيق سمة معدة مسبقاً: ${preset.name}", "", "")
+        saveToDatabase()
+    }
+
+    fun addCashToBoxYer(amount: Double) {
+        if (amount <= 0.0) return
+        val current = _uiState.value.cashInBoxYerInput.trim().toDoubleOrNull() ?: 0.0
+        val updated = current + amount
+        val formatted = if (updated % 1.0 == 0.0) updated.toLong().toString() else updated.toString()
+        _uiState.update { it.copy(cashInBoxYerInput = formatted) }
+        addAuditLog("الصندوق", "زيادة النقد", "إضافة ${com.example.ui.model.AccountingFormatter.formatYer(amount)} للنقد", com.example.ui.model.AccountingFormatter.formatYer(current), com.example.ui.model.AccountingFormatter.formatYer(updated))
         saveToDatabase()
     }
 
@@ -4783,7 +4849,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     fun createBackup(title: String = "", notes: String = "") {
         viewModelScope.launch {
             val currentState = _uiState.value
-            val summary = salesSummary.value
+            val summary = calculateSalesSummary(currentState)
             val timestamp = System.currentTimeMillis()
             val formattedDate = formatDateTimeForBackup(timestamp)
             val finalTitle = title.ifBlank { "نسخة احتياطية ($formattedDate)" }
@@ -4966,8 +5032,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         root.put("useEasternArabicNumerals", state.useEasternArabicNumerals)
         root.put("showHijriDate", state.showHijriDate)
         root.put("use24HourFormat", state.use24HourFormat)
-        root.put("isSalesAccordionMode", state.isSalesAccordionMode)
-        root.put("isCashBoxAccordionMode", state.isCashBoxAccordionMode)
         root.put("includeInternetInReport", state.includeInternetInReport)
         root.put("reportHeaderTitle", state.reportHeaderTitle)
         root.put("reportHeaderSubtitle", state.reportHeaderSubtitle)
@@ -5108,8 +5172,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         val useEasternArabicNumerals = root.optBoolean("useEasternArabicNumerals", currentState.useEasternArabicNumerals)
         val showHijriDate = root.optBoolean("showHijriDate", currentState.showHijriDate)
         val use24HourFormat = root.optBoolean("use24HourFormat", currentState.use24HourFormat)
-        val isSalesAccordionMode = root.optBoolean("isSalesAccordionMode", currentState.isSalesAccordionMode)
-        val isCashBoxAccordionMode = root.optBoolean("isCashBoxAccordionMode", currentState.isCashBoxAccordionMode)
         val includeInternetInReport = root.optBoolean("includeInternetInReport", currentState.includeInternetInReport)
         val reportHeaderTitle = root.optString("reportHeaderTitle", currentState.reportHeaderTitle)
         val reportHeaderSubtitle = root.optString("reportHeaderSubtitle", currentState.reportHeaderSubtitle)
@@ -5335,8 +5397,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
             useEasternArabicNumerals = useEasternArabicNumerals,
             showHijriDate = showHijriDate,
             use24HourFormat = use24HourFormat,
-            isSalesAccordionMode = isSalesAccordionMode,
-            isCashBoxAccordionMode = isCashBoxAccordionMode,
             includeInternetInReport = includeInternetInReport,
             reportHeaderTitle = reportHeaderTitle,
             reportHeaderSubtitle = reportHeaderSubtitle,
@@ -5354,5 +5414,145 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
             cashGroups = if (parsedCashGroups.isNotEmpty()) parsedCashGroups else currentState.cashGroups,
             expenses = parsedExpenses
         )
+    }
+
+    companion object {
+        fun calculateSalesSummary(state: DailyDirectSalesUiState): DailySalesSummary {
+            var totalGiven = 0
+            var totalAdded = 0
+            var totalRemaining = 0
+            var totalSold = 0
+            var totalRevenue = 0.0
+            var sideInternetRevenue = 0.0
+            var totalSideRevenue = 0.0
+            var hasErrors = false
+
+            val activeGroups = state.groups.filter { grp ->
+                grp.isEnabled && (state.includeInternetInReport || (grp.id != GROUP_INTERNET_ID && !grp.name.contains("انترنت")))
+            }
+
+            for (group in activeGroups) {
+                if (group.isExcludedFromBalance) {
+                    totalSideRevenue += group.totalRevenue
+                    if (group.id == GROUP_INTERNET_ID) {
+                        sideInternetRevenue += group.totalRevenue
+                    }
+                } else {
+                    totalRevenue += group.totalRevenue
+                }
+
+                val isSanadGroup = group.id == GROUP_SANAD_ID || group.name == "سند"
+                val isChiniGroup = group.id == GROUP_CHINI_ID || group.name.contains("صيني")
+                when (group.type) {
+                    SalesGroupType.DENOMINATIONS, SalesGroupType.CUSTOM_FIELDS -> {
+                        for (row in group.activeRows) {
+                            if (!isChiniGroup) {
+                                totalGiven += row.given
+                                totalAdded += row.added
+                                totalRemaining += row.remaining
+                                if (isSanadGroup) {
+                                    totalSold += row.sold
+                                }
+                            }
+                            if (row.isRemainingExceeded) {
+                                hasErrors = true
+                            }
+                        }
+                    }
+                    SalesGroupType.DIRECT_ENTRY -> {
+                        if (!isChiniGroup && isSanadGroup) {
+                            for (entry in group.directEntries) {
+                                if (entry.isFilled) totalSold += 1
+                            }
+                        }
+                    }
+                }
+            }
+
+            val cashYer = state.cashInBoxYerInput.trim().toDoubleOrNull() ?: 0.0
+            val cashSar = state.cashInBoxSarInput.trim().toDoubleOrNull() ?: 0.0
+            val exchangeRate = state.exchangeRateInput.trim().toDoubleOrNull()?.takeIf { it > 0 } ?: 380.0
+
+            val cashGroupsCashTotal = state.cashGroups
+                .filter { it.isEnabled && !it.isExcludedFromBalance && it.id != CASH_GROUP_MAIN_ID && (it.type == CashGroupType.DENOMINATIONS || it.type == CashGroupType.DIRECT_ENTRY) }
+                .filter { group ->
+                    if (group.type == CashGroupType.DENOMINATIONS) state.showCashDenominationsTable else true
+                }
+                .sumOf { it.getTotalYer(exchangeRate, cashYer) }
+
+            val isExpensesGroupEnabled = state.cashGroups.find { it.type == CashGroupType.EXPENSES || it.id == CASH_GROUP_EXPENSES_ID }?.isEnabled ?: false
+            val isDepositsGroupEnabled = state.cashGroups.find { it.type == CashGroupType.DEPOSITS || it.id == "cash_group_deposits" }?.isEnabled ?: false
+
+            val cashGroupsExpensesTotal = if (isExpensesGroupEnabled) {
+                state.cashGroups
+                    .filter { it.isEnabled && !it.isExcludedFromBalance && it.type == CashGroupType.EXPENSES }
+                    .sumOf { it.getTotalYer(exchangeRate) }
+            } else 0.0
+
+            val cashGroupsDepositsTotal = if (isDepositsGroupEnabled) {
+                state.cashGroups
+                    .filter { it.isEnabled && !it.isExcludedFromBalance && it.type == CashGroupType.DEPOSITS }
+                    .sumOf { it.getTotalYer(exchangeRate) }
+            } else 0.0
+
+            val expensesList = if (isExpensesGroupEnabled) state.expenses.filter { !it.isDeposit } else emptyList()
+            val depositsList = if (isDepositsGroupEnabled) state.expenses.filter { it.isDeposit } else emptyList()
+
+            val totalExpensesYer = expensesList.filter { !it.isSar }.sumOf { it.amount }
+            val totalExpensesSar = expensesList.filter { it.isSar }.sumOf { it.amount }
+            val totalExpensesInYer = expensesList.sumOf { it.getTotalYer(exchangeRate) } + cashGroupsExpensesTotal
+
+            val totalDepositsYer = depositsList.filter { !it.isSar }.sumOf { it.amount }
+            val totalDepositsSar = depositsList.filter { it.isSar }.sumOf { it.amount }
+            val totalDepositsInYer = depositsList.sumOf { it.getTotalYer(exchangeRate) } + cashGroupsDepositsTotal
+
+            val physicalCashInBox = (cashYer + (cashSar * exchangeRate) + cashGroupsCashTotal).coerceAtLeast(0.0)
+            val otherCurrenciesTotalYer = (cashSar * exchangeRate) + cashGroupsCashTotal
+            val netCashYer = cashYer.coerceAtLeast(0.0)
+
+            val cashAmount = cashYer.coerceAtLeast(0.0)
+            val expensesAmount = totalExpensesInYer
+            val currenciesAmount = (cashSar * exchangeRate) + cashGroupsCashTotal
+            val depositsAmount = totalDepositsInYer
+
+            val totalBoxAmount = cashAmount + expensesAmount + currenciesAmount + depositsAmount
+            val grossCashInBox = totalBoxAmount
+
+            val balance = totalBoxAmount - totalRevenue
+
+            val balanceStatus = when {
+                kotlin.math.abs(balance) < 0.001 -> BalanceStatus.MATCHED
+                balance > 0.001 -> BalanceStatus.SURPLUS
+                else -> BalanceStatus.DEFICIT
+            }
+
+            return DailySalesSummary(
+                totalGiven = totalGiven,
+                totalAdded = totalAdded,
+                totalRemaining = totalRemaining,
+                totalSold = totalSold,
+                totalRevenue = totalRevenue,
+                sideInternetRevenue = sideInternetRevenue,
+                totalSideRevenue = totalSideRevenue,
+                cashInBoxYer = cashYer,
+                cashInBoxSar = cashSar,
+                netCashYer = netCashYer,
+                exchangeRateSarToYer = exchangeRate,
+                totalExpensesYer = totalExpensesYer,
+                totalExpensesSar = totalExpensesSar,
+                totalExpensesInYer = totalExpensesInYer,
+                totalDepositsYer = totalDepositsYer,
+                totalDepositsSar = totalDepositsSar,
+                totalDepositsInYer = totalDepositsInYer,
+                otherCurrenciesTotalYer = otherCurrenciesTotalYer,
+                grossCashInBox = grossCashInBox,
+                cashInBox = physicalCashInBox,
+                balance = balance,
+                balanceStatus = balanceStatus,
+                hasErrors = hasErrors,
+                activeGroupsCount = activeGroups.size,
+                totalGroupsCount = state.groups.size
+            )
+        }
     }
 }

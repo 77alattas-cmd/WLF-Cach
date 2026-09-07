@@ -224,7 +224,8 @@ data class SalesGroupUiState(
     val givenLabel: String = "المعطى",
     val addedLabel: String = "إضافة",
     val remainingLabel: String = "المتبقي",
-    val defaultFormula: CalculationFormula = CalculationFormula.TICKET_STANDARD
+    val defaultFormula: CalculationFormula = CalculationFormula.TICKET_STANDARD,
+    val color: Long? = null
 ) {
     /**
      * Common price/category for the entire group (e.g. for simple calculator)
@@ -455,7 +456,8 @@ data class CashBoxGroupUiState(
     val addToBalance: Boolean = !isExcludedFromBalance, // إضافة للرصيد والموازنة
     val notes: String = "",
     val denomRows: List<CashDenomRowUiState> = DEFAULT_CASH_DENOMINATIONS.map { CashDenomRowUiState(denomination = it) },
-    val directEntries: List<CashDirectEntryItem> = emptyList()
+    val directEntries: List<CashDirectEntryItem> = emptyList(),
+    val color: Long? = null
 ) {
     val activeDenomRows: List<CashDenomRowUiState>
         get() = denomRows.filter { it.isEnabled }

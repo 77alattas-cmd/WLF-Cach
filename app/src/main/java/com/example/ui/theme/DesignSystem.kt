@@ -89,8 +89,8 @@ fun Modifier.vibrant3d(
         width = 1.dp,
         brush = Brush.verticalGradient(
             colors = listOf(
-                Color.White.copy(alpha = if (isDark) 0.15f else 0.4f),
-                Color.Black.copy(alpha = if (isDark) 0.3f else 0.1f)
+                Color.White.copy(alpha = if (isDark) 0.15f else 0.5f),
+                Color.Black.copy(alpha = if (isDark) 0.3f else 0.2f)
             )
         ),
         shape = shape

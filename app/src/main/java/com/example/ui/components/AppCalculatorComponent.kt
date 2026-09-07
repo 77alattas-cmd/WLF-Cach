@@ -1005,12 +1005,13 @@ fun UniversalFieldCalculatorDialog(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .padding(vertical = 16.dp),
+                .fillMaxWidth(0.98f)
+                .fillMaxHeight(0.88f)
+                .padding(vertical = 12.dp),
             contentAlignment = Alignment.Center
         ) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
@@ -1375,14 +1376,18 @@ fun FieldCalculatorDialog(
         resultPreview = if (eval.isNotBlank() && eval != displayExpr) eval else ""
     }
 
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Surface(
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
             shadowElevation = 8.dp,
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(0.98f)
+                .fillMaxHeight(0.88f)
                 .padding(8.dp)
         ) {
             Column(

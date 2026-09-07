@@ -449,6 +449,26 @@ fun SettingsScreen(
                         )
                     }
 
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("شريط حالة ملخص الميزانية", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+                            Text(
+                                text = "إظهار أو إخفاء شريط حالة الموازنة والملخص العلوي في شاشات المبيعات والصندوق",
+                                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 10.sp)
+                            )
+                        }
+                        Switch(
+                            checked = uiState.showBudgetSummaryBar,
+                            onCheckedChange = { viewModel.toggleBudgetSummaryBar() },
+                            modifier = Modifier.testTag("switch_budget_summary_bar")
+                        )
+                    }
 
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 
@@ -461,12 +481,12 @@ fun SettingsScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             Text("بداية اليوم المحاسبي", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
                             Text(
-                                text = "الساعة التي يبدأ عندها احتساب وردية اليوم الجديد (${uiState.accountingDayStartHour}:00)",
+                                text = "الساعة التي يبدأ عندها احتساب وردية اليوم الجديد (${uiState.accountingDayStartHour}:00 ص)",
                                 style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 10.sp)
                             )
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            listOf(0, 3, 5, 6).forEach { hr ->
+                            listOf(0, 3, 4, 5, 6).forEach { hr ->
                                 FilterChip(
                                     selected = uiState.accountingDayStartHour == hr,
                                     onClick = { viewModel.setAccountingDayStartHour(hr) },
@@ -479,15 +499,62 @@ fun SettingsScreen(
 
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 
-                    // Auto Reset Time
-                    OutlinedTextField(
-                        value = uiState.scheduledResetTime,
-                        onValueChange = { viewModel.setScheduledResetTime(it) },
-                        label = { Text("وقت التصفير التلقائي اليومي (HH:mm)") },
-                        placeholder = { Text("03:00") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    // Auto Reset Toggle & Time
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("التصفير التلقائي اليومي", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+                            Text(
+                                text = "تصفير الحقول وأرشفة اليوم المحاسبي تلقائياً عند حلول الوقت المحدد",
+                                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 10.sp)
+                            )
+                        }
+                        Switch(
+                            checked = uiState.isAutoDailyResetEnabled,
+                            onCheckedChange = { viewModel.setAutoDailyResetEnabled(it) },
+                            modifier = Modifier.testTag("switch_auto_daily_reset")
+                        )
+                    }
+
+                    if (uiState.isAutoDailyResetEnabled) {
+                        OutlinedTextField(
+                            value = uiState.scheduledResetTime,
+                            onValueChange = { viewModel.setScheduledResetTime(it) },
+                            label = { Text("وقت التصفير التلقائي اليومي (HH:mm)") },
+                            placeholder = { Text("03:00") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            listOf("00:00", "03:00", "04:00", "05:00", "06:00").forEach { presetTime ->
+                                FilterChip(
+                                    selected = uiState.scheduledResetTime == presetTime,
+                                    onClick = { viewModel.setScheduledResetTime(presetTime) },
+                                    label = { Text(presetTime, fontSize = 11.sp) }
+                                )
+                            }
+                        }
+
+                        FilledTonalButton(
+                            onClick = { viewModel.triggerManualAutoResetTest() },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("اختبار التصفير التلقائي الآن فوراً (يدوي)", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
             }
         }

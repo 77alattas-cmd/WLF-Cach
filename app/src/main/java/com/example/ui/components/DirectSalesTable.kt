@@ -266,33 +266,6 @@ fun DirectSalesTable(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (isEnabled && !isLockGivenExtraMode && onToggleAddedField != null) {
-                            FilterChip(
-                                selected = isAddedFieldEnabled,
-                                onClick = { onToggleAddedField() },
-                                label = {
-                                    Text(
-                                        text = if (isAddedFieldEnabled) "الإضافي مفعّل ✓" else "إضافي",
-                                        fontSize = 10.5.sp,
-                                        fontWeight = if (isAddedFieldEnabled) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = if (isAddedFieldEnabled) Icons.Default.AddCircle else Icons.Default.AddCircleOutline,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(14.dp)
-                                    )
-                                },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    selectedLeadingIconColor = MaterialTheme.colorScheme.secondary
-                                ),
-                                modifier = Modifier.testTag("btn_table_toggle_added_${groupName}")
-                            )
-                        }
-
                         if (isEnabled && !isLockGivenExtraMode && rows.size > 1) {
                             FilterChip(
                                 selected = isTableReorderEnabled,
@@ -317,6 +290,33 @@ fun DirectSalesTable(
                                     selectedLeadingIconColor = MaterialTheme.colorScheme.primary
                                 ),
                                 modifier = Modifier.testTag("btn_table_reorder_${groupName}")
+                            )
+                        }
+
+                        if (isEnabled && !isLockGivenExtraMode && onToggleAddedField != null) {
+                            FilterChip(
+                                selected = isAddedFieldEnabled,
+                                onClick = { onToggleAddedField() },
+                                label = {
+                                    Text(
+                                        text = if (isAddedFieldEnabled) "الإضافي مفعّل ✓" else "إضافي",
+                                        fontSize = 10.5.sp,
+                                        fontWeight = if (isAddedFieldEnabled) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = if (isAddedFieldEnabled) Icons.Default.AddCircle else Icons.Default.AddCircleOutline,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    selectedLeadingIconColor = MaterialTheme.colorScheme.secondary
+                                ),
+                                modifier = Modifier.testTag("btn_table_toggle_added_${groupName}")
                             )
                         }
                     }
@@ -367,7 +367,7 @@ fun DirectSalesTable(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "دمج الإضافي مع المعطى (إضافة بدون حساب تلقائي كمباع)",
+                                    text = "دمج الإضافي مع المعطى",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 11.sp,
