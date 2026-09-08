@@ -1559,72 +1559,7 @@ fun SettingsScreen(
             }
         }
 
-        // 7. About Application & Version Info Card
-        item {
-            SettingsSectionCard(title = "حول التطبيق والمعلومات", icon = Icons.Default.Info) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "إصدار التطبيق الحالي:",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer
-                        ) {
-                            Text(
-                                text = "v3.2.0 (WLF1S)",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                ),
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                            )
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "إصدار التطبيق الأصلي:",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = MaterialTheme.colorScheme.secondaryContainer
-                        ) {
-                            Text(
-                                text = "v1.0.0 (الأساسي)",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.secondary
-                                ),
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                            )
-                        }
-                    }
-
-                    Text(
-                        text = "نظام WLF Cash المحاسبي لإدارة النقدية ومطابقة مبيعات التذاكر والصناديق بدقة وسرعة واحترافية.",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 11.sp)
-                    )
-                }
-            }
-        }
-
-        // 7.5. System Maintenance Card
+        // 7. System Maintenance Card
         item {
             Surface(
                 shape = RoundedCornerShape(14.dp),
@@ -1681,7 +1616,48 @@ fun SettingsScreen(
             }
         }
 
-        // 8. Developer & Designer Credit Card
+        // 8. About Application Card (حول التطبيق - في الأسفل فقط)
+        item {
+            SettingsSectionCard(title = "حول التطبيق والمعلومات", icon = Icons.Default.Info) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "إصدار التطبيق الأساسي:",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer
+                        ) {
+                            Text(
+                                text = "1.1",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                ),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "نظام WLF Cash المحاسبي لإدارة النقدية ومطابقة مبيعات التذاكر والصناديق بدقة وسرعة واحترافية.",
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 11.sp)
+                    )
+                }
+            }
+        }
+
+        // 9. Developer & Designer Credit Card
         item {
             Surface(
                 shape = RoundedCornerShape(14.dp),
@@ -1697,7 +1673,7 @@ fun SettingsScreen(
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
@@ -1711,22 +1687,43 @@ fun SettingsScreen(
                                 modifier = Modifier.size(20.dp)
                             )
                             Text(
-                                text = "التصميم والتطوير",
+                                text = "تصميم وتطوير",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                             )
                         }
+                    }
 
+                    // Centered and separated: DESIGN & Development + HAS
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "DESIGN & Development",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                letterSpacing = 1.sp
+                            ),
+                            textAlign = TextAlign.Center
+                        )
                         Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = MaterialTheme.colorScheme.primary
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            shadowElevation = 2.dp
                         ) {
                             Text(
-                                text = "Design By : HAS",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                text = "HAS",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.White,
+                                    letterSpacing = 2.sp
                                 ),
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
+                                textAlign = TextAlign.Center
                             )
                         }
                     }

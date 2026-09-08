@@ -747,7 +747,8 @@ fun CashDirectGroupTable(
                         onEdit = { editingItem = entry },
                         onDelete = { onRemoveEntry(entry.id) },
                         onOpenCalculator = { onOpenCalculator?.invoke(entry.id) },
-                        isReadOnly = isReadOnly
+                        isReadOnly = isReadOnly,
+                        isDeposit = group.type == CashGroupType.DEPOSITS
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -842,7 +843,8 @@ private fun CashDirectEntryRow(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onOpenCalculator: () -> Unit,
-    isReadOnly: Boolean = false
+    isReadOnly: Boolean = false,
+    isDeposit: Boolean = false
 ) {
     val curr = entry.currency
     val yerEquivalent = entry.getTotalYer(exchangeRate)
@@ -890,7 +892,7 @@ private fun CashDirectEntryRow(
                             modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp)
                         )
                     }
-                    if (entry.deductFromCash) {
+                    if (entry.deductFromCash && !isDeposit) {
                         Spacer(modifier = Modifier.width(4.dp))
                         Surface(
                             shape = RoundedCornerShape(4.dp),

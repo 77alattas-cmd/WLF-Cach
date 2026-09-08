@@ -55,7 +55,7 @@ data class AppThemePreset(
 val PRESET_APP_THEMES = listOf(
     // ☀️ DAY THEMES (السمات النهارية أولاً)
     AppThemePreset(
-        name = "⚙️ سمة الفولاذ المصقول (الافتراضي)",
+        name = "⚙️ فولاذ",
         description = "السمة النهارية الافتراضية: سمة فاخرة بدرجات الفولاذ الفضي والستيل المضيء عالي الوضوح",
         primaryColor = 0xFF475569,
         headerBgColor = 0xFFE2E8F0,
@@ -68,7 +68,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_STEEL"
     ),
     AppThemePreset(
-        name = "🐅 سمة نادي الاتحاد السعودي (العميد والنمور)",
+        name = "🐅 الاتحاد",
         description = "مظهر رياضي ملكي ناصع بألوان نادي الاتحاد السعودي الأصيلة: الأصفر الذهبي والأسود الفخم",
         primaryColor = 0xFFEAB308,
         headerBgColor = 0xFFFEF9C3,
@@ -81,7 +81,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_CARBON_FIBER"
     ),
     AppThemePreset(
-        name = "💎 سمة الزمرد العصري الحديث",
+        name = "💎 الزمرد",
         description = "مظهر نهاري عصري ومنعش بتدرجات الزمرد والنعناع المريح للعين مع أبيض ناصع",
         primaryColor = 0xFF059669,
         headerBgColor = 0xFFECFDF5,
@@ -94,7 +94,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_GRANULAR_WALL"
     ),
     AppThemePreset(
-        name = "🌊 سمة النيلي المحيطي الهادئ",
+        name = "🌊 محيط",
         description = "مظهر نهاري أنيق وعصري بدرجات الأزرق المحيطي والأزرق الفيروزي النقي",
         primaryColor = 0xFF0284C7,
         headerBgColor = 0xFFF0F9FF,
@@ -107,7 +107,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_GRANULAR_WALL"
     ),
     AppThemePreset(
-        name = "🌸 سمة الورد المخملي الفاخر",
+        name = "🌸 الورد",
         description = "مظهر نهاري ناعم بتدرجات الوردي والمارون الهادئ بتباين راقٍ",
         primaryColor = 0xFFE11D48,
         headerBgColor = 0xFFFFF1F2,
@@ -120,7 +120,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_GRANULAR_WALL"
     ),
     AppThemePreset(
-        name = "🏛️ سمة الجدار المحبب المعماري",
+        name = "🏛️ معماري",
         description = "مظهر جداري إسمنتي محبب ناعم وعصري بطابع معماري مريح للبصر",
         primaryColor = 0xFF475569,
         headerBgColor = 0xFFF1F5F9,
@@ -133,7 +133,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_GRANULAR_WALL"
     ),
     AppThemePreset(
-        name = "🪵 سمة الخشب الطبيعي الجميل",
+        name = "🪵 خشب",
         description = "خشب الجوز والأرو الفاخر بتدرجات البني الدافئ والنقوش الخشبية الراقية",
         primaryColor = 0xFF8D6E63,
         headerBgColor = 0xFFEFEBE9,
@@ -146,7 +146,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_WOOD_GRAIN"
     ),
     AppThemePreset(
-        name = "⚙️ سمة الفولاذ المصقول",
+        name = "⚙️ فولاذ 2",
         description = "سمة فاخرة بدرجات الفولاذ الفضي والستيل المضيء",
         primaryColor = 0xFF475569,
         headerBgColor = 0xFFE2E8F0,
@@ -159,7 +159,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_STEEL"
     ),
     AppThemePreset(
-        name = "🪙 سمة الذهب البراق",
+        name = "🪙 ذهب",
         description = "خلفية وواجهة برّاقة بتدرجات الذهب الخالص والبرونز الفاخر",
         primaryColor = 0xFFB45309,
         headerBgColor = 0xFFFEF3C7,
@@ -172,7 +172,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_GOLD"
     ),
     AppThemePreset(
-        name = "⚙️ سمة الفضة اللامعة",
+        name = "🥈 فضة",
         description = "طابع ناصع وأنيق بتدرجات الفضة والكروم المصقول",
         primaryColor = 0xFF64748B,
         headerBgColor = 0xFFF8FAFC,
@@ -185,7 +185,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_SILVER"
     ),
     AppThemePreset(
-        name = "🧱 سمة البرونز والنحاس المعشق",
+        name = "🧱 برونز",
         description = "مظهر نحاسي فاخر بالدرجات الأنيقة والدافئة",
         primaryColor = 0xFFC2410C,
         headerBgColor = 0xFFFFEDD5,
@@ -200,7 +200,7 @@ val PRESET_APP_THEMES = listOf(
 
     // 🌙 NIGHT THEMES (السمات الليلية ثانياً)
     AppThemePreset(
-        name = "🛠️ سمة التيتانيوم الصلب الداكن (الافتراضي)",
+        name = "🛠️ تيتانيوم (ليلي)",
         description = "السمة الليلية الافتراضية: سمة معدنية صلبة فاخرة بخلفية التيتانيوم المسبوك الفاخر مريحة جداً للعين",
         primaryColor = 0xFF94A3B8,
         headerBgColor = 0xFF0F172A,
@@ -213,7 +213,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_TITANIUM"
     ),
     AppThemePreset(
-        name = "🐅 سمة نادي الاتحاد السعودي (العميد والنمور)",
+        name = "🐅 الاتحاد (ليلي)",
         description = "مظهر ليلي كربوني فخم بألوان نادي الاتحاد السعودي: أسود فاحم مع تطعيمات الأصفر والذهبي الملكي",
         primaryColor = 0xFFFACC15,
         headerBgColor = 0xFF09090B,
@@ -226,7 +226,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_CARBON_FIBER"
     ),
     AppThemePreset(
-        name = "🔮 سمة النيون السيبراني الحديث",
+        name = "🔮 نيون",
         description = "مظهر ليلي فائق التطور بتدرجات النيون البنفسجي الفوسفوري وأسود الأوليد",
         primaryColor = 0xFFA855F7,
         headerBgColor = 0xFF0D0B18,
@@ -239,7 +239,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_CARBON_FIBER"
     ),
     AppThemePreset(
-        name = "🏎️ سمة كاربون فايبر الرياضي",
+        name = "🏎️ كاربون",
         description = "مظهر ألياف الكربون الرياضية المنسوجة الداكنة بتباين أحمر وفحمي فائق الأناقة",
         primaryColor = 0xFFEF4444,
         headerBgColor = 0xFF18181B,
@@ -252,7 +252,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_CARBON_FIBER"
     ),
     AppThemePreset(
-        name = "💺 سمة الجلد المخرم الفاخر",
+        name = "💺 جلد فاخر",
         description = "مظهر الجلد الملكي الفاخر بتخريمات ناعمة وتطريز هافان وأسود أنيق",
         primaryColor = 0xFFD97706,
         headerBgColor = 0xFF1C1917,
@@ -265,7 +265,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_PERFORATED_LEATHER"
     ),
     AppThemePreset(
-        name = "🛠️ سمة التيتانيوم الصلب الداكن",
+        name = "🛠️ تيتانيوم 2",
         description = "سمة ليلية صلبة بخلفية التيتانيوم المسبوك الفاخر",
         primaryColor = 0xFF94A3B8,
         headerBgColor = 0xFF0F172A,
@@ -278,7 +278,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_TITANIUM"
     ),
     AppThemePreset(
-        name = "👑 سمة الذهب والسبائك الملكية الليلية",
+        name = "👑 ذهب ملكي",
         description = "مظهر ليلي كربوني فخم بتطعيمات الذهب الخالص والأصفر الملكي البراق",
         primaryColor = 0xFFF59E0B,
         headerBgColor = 0xFF140F04,
@@ -291,7 +291,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "METALLIC_GOLD"
     ),
     AppThemePreset(
-        name = "🌌 سمة الفضاء السديمي والكون",
+        name = "🌌 فضاء",
         description = "مظهر كوني داكن بدرجات البنفسجي السديمي والنيلي المتوهج",
         primaryColor = 0xFF8B5CF6,
         headerBgColor = 0xFF0F0B1E,
@@ -304,7 +304,7 @@ val PRESET_APP_THEMES = listOf(
         bgStyle = "TEXTURE_CARBON_FIBER"
     ),
     AppThemePreset(
-        name = "🌲 سمة الزمرد وغابات الليل",
+        name = "🌲 زمرد ليلي",
         description = "مظهر طبيعي داكن مستوحى من أشجار الغابات ليلاً بتوهج الزمرد الأخضر",
         primaryColor = 0xFF059669,
         headerBgColor = 0xFF04140D,
@@ -4076,6 +4076,14 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         saveToDatabase()
     }
 
+    fun setShowAddGroupDialog(show: Boolean) {
+        _uiState.update { it.copy(showAddGroupDialog = show) }
+    }
+
+    fun setShowAddCashGroupDialog(show: Boolean) {
+        _uiState.update { it.copy(showAddCashGroupDialog = show) }
+    }
+
     fun updateGroupName(groupId: String, newName: String) {
         _uiState.update { state ->
             val updated = state.groups.map { if (it.id == groupId) it.copy(name = newName.trim()) else it }
@@ -4087,6 +4095,22 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     fun updateCashGroupName(groupId: String, newName: String) {
         _uiState.update { state ->
             val updated = state.cashGroups.map { if (it.id == groupId) it.copy(name = newName.trim()) else it }
+            state.copy(cashGroups = updated)
+        }
+        saveToDatabase()
+    }
+
+    fun updateSalesGroupColor(groupId: String, colorLong: Long?) {
+        _uiState.update { state ->
+            val updated = state.groups.map { if (it.id == groupId) it.copy(color = colorLong) else it }
+            state.copy(groups = updated)
+        }
+        saveToDatabase()
+    }
+
+    fun updateCashGroupColor(groupId: String, colorLong: Long?) {
+        _uiState.update { state ->
+            val updated = state.cashGroups.map { if (it.id == groupId) it.copy(color = colorLong) else it }
             state.copy(cashGroups = updated)
         }
         saveToDatabase()
@@ -5067,6 +5091,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
             gObj.put("isAddedFieldEnabled", g.isAddedFieldEnabled)
             gObj.put("isExcludedFromBalance", g.isExcludedFromBalance)
             gObj.put("notes", g.notes)
+            gObj.put("color", g.color ?: -1L)
 
             val rowsArray = org.json.JSONArray()
             for (r in g.rows) {
@@ -5109,6 +5134,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
             cgObj.put("isExpanded", cg.isExpanded)
             cgObj.put("orderIndex", cg.orderIndex)
             cgObj.put("isDefault", cg.isDefault)
+            cgObj.put("color", cg.color ?: -1L)
 
             val denomsArray = org.json.JSONArray()
             for (dr in cg.denomRows) {
@@ -5211,6 +5237,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                 val isAddedFieldEnabled = gObj.optBoolean("isAddedFieldEnabled", false)
                 val isExcludedFromBalance = gObj.optBoolean("isExcludedFromBalance", false)
                 val groupNotes = gObj.optString("notes", "")
+                val groupColor = gObj.optLong("color", -1L).let { if (it == -1L) null else it }
 
                 val rowsList = mutableListOf<DirectSalesRowUiState>()
                 val rowsArray = gObj.optJSONArray("rows")
@@ -5275,7 +5302,8 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                         isExcludedFromBalance = isExcludedFromBalance,
                         notes = groupNotes,
                         rows = rowsList,
-                        directEntries = directList
+                        directEntries = directList,
+                        color = groupColor
                     )
                 )
             }
@@ -5294,6 +5322,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                 val isExpanded = cgObj.optBoolean("isExpanded", true)
                 val orderIndex = cgObj.optInt("orderIndex", i)
                 val isDefault = cgObj.optBoolean("isDefault", false)
+                val cashGroupColor = cgObj.optLong("color", -1L).let { if (it == -1L) null else it }
 
                 val denomList = mutableListOf<CashDenomRowUiState>()
                 val denomsArray = cgObj.optJSONArray("denomRows")
@@ -5345,7 +5374,8 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                         orderIndex = orderIndex,
                         isDefault = isDefault,
                         denomRows = denomList,
-                        directEntries = directCashList
+                        directEntries = directCashList,
+                        color = cashGroupColor
                     )
                 )
             }

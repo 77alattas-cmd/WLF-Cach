@@ -15,6 +15,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -404,6 +408,36 @@ fun ManagementSalesGroupsScreen(
                                     text = "خيار الموازنة",
                                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp)
                                 )
+                            }
+                        }
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+
+                        // تلوين المجموعة
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("تلوين المجموعة:", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                                val colors = listOf(null, 0xFF1E88E5L, 0xFF43A047L, 0xFFE53935L, 0xFFFB8C00L, 0xFF8E24AAL, 0xFF00ACC1L)
+                                colors.forEach { c ->
+                                    val isSelected = group.color == c
+                                    Box(
+                                        modifier = Modifier
+                                            .size(22.dp)
+                                            .clip(CircleShape)
+                                            .background(if (c == null) MaterialTheme.colorScheme.surfaceVariant else Color(c))
+                                            .border(BorderStroke(if (isSelected) 2.dp else 1.dp, if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant), CircleShape)
+                                            .clickable { viewModel.updateSalesGroupColor(group.id, c) },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (c == null) {
+                                            Text("✕", fontSize = 9.sp, color = MaterialTheme.colorScheme.outline)
+                                        }
+                                    }
+                                }
                             }
                         }
 

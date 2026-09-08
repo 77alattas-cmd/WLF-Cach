@@ -99,13 +99,13 @@ fun SplashScreen(viewModel: TicketAccountingViewModel) {
                 border = BorderStroke(0.8.dp, Color(0xFF4B5563))
             ) {
                 Text(
-                    text = "الإصدار v3.2.0 • الأصلي v1.0.0",
+                    text = "الإصدار 1.1",
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = Color(0xFF9CA3AF),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
                     ),
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                 )
             }
         }

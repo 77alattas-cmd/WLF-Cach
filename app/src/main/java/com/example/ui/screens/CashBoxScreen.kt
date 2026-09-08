@@ -2,6 +2,7 @@ package com.example.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,6 +36,10 @@ import androidx.compose.runtime.derivedStateOf
 import kotlinx.coroutines.launch
 import com.example.ui.theme.vibrant3d
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
+import android.net.Uri
 import com.example.ui.model.CalcAppSection
 import com.example.ui.components.*
 import com.example.ui.model.*
@@ -991,6 +996,53 @@ fun CashBoxScreen(
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
+
+                        if (isDeposit) {
+                            var depositImageUri by remember { mutableStateOf<String?>(null) }
+                            val galleryLauncher = rememberLauncherForActivityResult(
+                                contract = ActivityResultContracts.PickVisualMedia()
+                            ) { uri: Uri? ->
+                                if (uri != null) depositImageUri = uri.toString()
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                                    .padding(10.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Text(
+                                    text = "إلتقاط أو اختيار صورة إيصال الإيداع (اختياري)",
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary),
+                                    fontSize = 11.sp
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    OutlinedButton(
+                                        onClick = {
+                                            galleryLauncher.launch(
+                                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                            )
+                                        },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(Icons.Default.PhotoLibrary, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("من الاستوديو", fontSize = 11.sp)
+                                    }
+                                }
+                                if (depositImageUri != null) {
+                                    Text(
+                                        text = "تم إرفاق صورة الإيصال بنجاح",
+                                        style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary),
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                        }
 
                         if (!isDeposit) {
                             Surface(

@@ -178,7 +178,7 @@ object ReportExporter {
         if (state.notes.isNotBlank()) {
             sb.append("\n📝 ملاحظات: ${state.notes}\n")
         }
-        sb.append("\nتم استخراج التقرير عبر تطبيق محاسبة مبيعات التذاكر والصندوق | Design By : HAS (+967780776191)")
+        sb.append("\nتم استخراج التقرير عبر تطبيق محاسبة مبيعات التذاكر والصندوق | DESIGN & Development : HAS (+967780776191)")
         return sb.toString()
     }
 
@@ -719,6 +719,6 @@ object ReportExporter {
         textPaint.textSize = 8.5f * scale
         textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         textPaint.textAlign = Paint.Align.CENTER
-        canvas.drawText("تم إنشاء التقرير بواسطة تطبيق محاسبة مبيعات التذاكر والصندوق | Design By : HAS (+967780776191)", width / 2, height - (14f * scale), textPaint)
+        canvas.drawText("تم إنشاء التقرير بواسطة تطبيق محاسبة مبيعات التذاكر والصندوق | DESIGN & Development : HAS (+967780776191)", width / 2, height - (14f * scale), textPaint)
     }
 }

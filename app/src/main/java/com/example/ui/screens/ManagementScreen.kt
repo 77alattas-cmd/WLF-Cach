@@ -719,9 +719,9 @@ fun ManagementScreen(
                                                 }
                                             }
 
-                                            // Skin (جلد السمة) Section
+                                            // Theme Skin Section
                                             Text(
-                                                text = "جلد السمة البصري (Skin) لإضفاء الحيوية:",
+                                                text = "قشرة السمات البصرية لإضفاء الحيوية والأناقة:",
                                                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary),
                                                 modifier = Modifier.padding(top = 4.dp)
                                             )
