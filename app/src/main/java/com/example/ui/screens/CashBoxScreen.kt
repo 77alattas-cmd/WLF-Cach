@@ -34,6 +34,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.derivedStateOf
 import kotlinx.coroutines.launch
+import com.example.ui.theme.DesignSystem
 import com.example.ui.theme.vibrant3d
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -148,9 +149,10 @@ fun CashBoxScreen(
                         shape = RoundedCornerShape(16.dp),
                         elevation = 6.dp,
                         isDark = isDark,
-                        baseColor = MaterialTheme.colorScheme.surface
+                        gradientBrush = DesignSystem.cardGradient(isDark)
                     ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                color = Color.Transparent
             ) {
             Column(
                 modifier = Modifier
@@ -366,6 +368,30 @@ fun CashBoxScreen(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "صندوق جديد",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // زر اختصار الانتقال للمبيعات
+                FilledTonalButton(
+                    onClick = { viewModel.navigateTo(AppScreen.DIRECT_SALES) },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.height(30.dp).testTag("btn_shortcut_to_sales")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ConfirmationNumber,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "المبيعات 🎟️",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -822,7 +848,7 @@ fun CashBoxScreen(
         val cashGroup = uiState.cashGroups.find { g -> g.directEntries.any { it.id == id } }
         val isDeposit = (expense?.isDeposit == true) || (cashGroup?.type == CashGroupType.DEPOSITS) || (cashGroup?.id == "cash_group_deposits")
         val isForeignCurrency = !isExpense && !isDeposit
-        var returnToCash by remember { mutableStateOf(false) }
+        var returnToCash by remember { mutableStateOf(true) }
         
         val groupName = uiState.cashGroups.find { g -> g.directEntries.any { it.id == id } }?.name ?: "المصروفات والإيداعات"
         val dialogTitle = if (isDeposit) "هل تريد حذف الإيداع" else "هل تريد حذف من ($groupName)"
@@ -837,19 +863,27 @@ fun CashBoxScreen(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     
-                    if (isForeignCurrency) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Checkbox(
-                                checked = returnToCash,
-                                onCheckedChange = { returnToCash = it }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { returnToCash = !returnToCash }
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Checkbox(
+                            checked = returnToCash,
+                            onCheckedChange = { returnToCash = it }
+                        )
+                        Column {
+                            Text(
+                                text = "إرجاع للصندوق / تعديل النقد (مفعل افتراضياً)",
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
                             )
                             Text(
-                                text = "إعادة المبلغ للنقد (عكس الخصم)",
-                                style = MaterialTheme.typography.bodySmall
+                                text = "إعادة القيمة إلى الصندوق الفعلي أو إلغاء الخصم.",
+                                style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 9.sp)
                             )
                         }
                     }

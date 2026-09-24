@@ -1,6 +1,8 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,12 +23,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.model.AccountingFormatter
 import com.example.ui.model.BalanceStatus
+import com.example.ui.theme.DesignSystem
+import com.example.ui.theme.vibrant3d
+import androidx.compose.foundation.isSystemInDarkTheme
 import kotlin.math.abs
 
 @Composable
@@ -35,7 +42,8 @@ fun BalanceStatusBadge(
     balanceAmount: Double,
     modifier: Modifier = Modifier
 ) {
-    val bgColor: Color
+    val isDark = isSystemInDarkTheme()
+    val gradient: Brush
     val borderColor: Color
     val contentColor: Color
     val icon: androidx.compose.ui.graphics.vector.ImageVector
@@ -44,41 +52,45 @@ fun BalanceStatusBadge(
 
     when (status) {
         BalanceStatus.MATCHED -> {
-            bgColor = MaterialTheme.colorScheme.surfaceVariant
-            borderColor = MaterialTheme.colorScheme.outline
-            contentColor = MaterialTheme.colorScheme.onSurface
+            gradient = DesignSystem.emeraldGradient()
+            borderColor = Color(0xFF34D399)
+            contentColor = Color.White
             icon = Icons.Default.CheckCircle
             statusText = "حالة الموازنة: متطابق تماماً ✓"
             explanation = "المبيعات متطابقة مع مبلغ الصندوق الفعلي (لا يوجد عجز أو فائض)"
         }
         BalanceStatus.DEFICIT -> {
-            bgColor = MaterialTheme.colorScheme.primary
-            borderColor = MaterialTheme.colorScheme.primary
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            gradient = DesignSystem.roseGradient()
+            borderColor = Color(0xFFF87171)
+            contentColor = Color.White
             icon = Icons.Default.TrendingDown
             statusText = "حالة الموازنة: عجز في الصندوق (${AccountingFormatter.formatMoney(balanceAmount)}) ↓"
             explanation = "مبلغ الصندوق الفعلي أقل من مجموع المبيعات بمقدار ${AccountingFormatter.formatMoney(balanceAmount)}"
         }
         BalanceStatus.SURPLUS -> {
-            bgColor = MaterialTheme.colorScheme.surface
-            borderColor = MaterialTheme.colorScheme.outline
-            contentColor = MaterialTheme.colorScheme.onSurface
+            gradient = DesignSystem.amberGradient()
+            borderColor = Color(0xFFFBBF24)
+            contentColor = Color(0xFF451A03)
             icon = Icons.Default.TrendingUp
             statusText = "حالة الموازنة: فائض في الصندوق (${AccountingFormatter.formatMoney(abs(balanceAmount))}) ↑"
             explanation = "مبلغ الصندوق الفعلي يزيد عن مجموع المبيعات بمقدار ${AccountingFormatter.formatMoney(abs(balanceAmount))}"
         }
     }
 
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = bgColor,
-        border = BorderStroke(1.5.dp, borderColor),
-        modifier = modifier.fillMaxWidth()
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .vibrant3d(
+                shape = RoundedCornerShape(14.dp),
+                elevation = 6.dp,
+                isDark = isDark,
+                gradientBrush = gradient
+            )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -101,7 +113,7 @@ fun BalanceStatusBadge(
                 Text(
                     text = explanation,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = contentColor.copy(alpha = 0.9f),
+                        color = contentColor.copy(alpha = 0.95f),
                         fontSize = 11.sp
                     )
                 )
@@ -116,46 +128,50 @@ fun MiniBalanceStatusBadge(
     balanceAmount: Double,
     modifier: Modifier = Modifier
 ) {
-    val bgColor: Color
+    val isDark = isSystemInDarkTheme()
+    val gradient: Brush
     val borderColor: Color
     val contentColor: Color
     val text: String
 
     when (status) {
         BalanceStatus.MATCHED -> {
-            bgColor = MaterialTheme.colorScheme.surfaceVariant
-            borderColor = MaterialTheme.colorScheme.outlineVariant
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            gradient = DesignSystem.emeraldGradient()
+            borderColor = Color(0xFF34D399)
+            contentColor = Color.White
             text = "متطابق ✓"
         }
         BalanceStatus.DEFICIT -> {
-            bgColor = MaterialTheme.colorScheme.primary
-            borderColor = MaterialTheme.colorScheme.primary
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            gradient = DesignSystem.roseGradient()
+            borderColor = Color(0xFFF87171)
+            contentColor = Color.White
             text = "عجز: ${AccountingFormatter.formatMoney(balanceAmount)} ↓"
         }
         BalanceStatus.SURPLUS -> {
-            bgColor = MaterialTheme.colorScheme.surface
-            borderColor = MaterialTheme.colorScheme.outline
-            contentColor = MaterialTheme.colorScheme.onSurface
+            gradient = DesignSystem.amberGradient()
+            borderColor = Color(0xFFFBBF24)
+            contentColor = Color(0xFF451A03)
             text = "فائض: ${AccountingFormatter.formatMoney(abs(balanceAmount))} ↑"
         }
     }
 
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = bgColor,
-        border = BorderStroke(1.dp, borderColor),
+    Box(
         modifier = modifier
+            .vibrant3d(
+                shape = RoundedCornerShape(10.dp),
+                elevation = 3.dp,
+                isDark = isDark,
+                gradientBrush = gradient
+            )
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.Bold,
                 color = contentColor,
-                fontSize = 13.sp
+                fontSize = 12.sp
             ),
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
         )
     }
 }

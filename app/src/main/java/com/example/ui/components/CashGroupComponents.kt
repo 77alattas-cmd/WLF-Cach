@@ -56,6 +56,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -1201,6 +1202,187 @@ fun CashDirectEntryDialog(
                     }
                 }
 
+                // Flexible Exchange Rate Row for Foreign Currencies (سعر الصرف المرن للعملات الأخرى)
+                if (selectedCurrency != AppCurrency.YER) {
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.CurrencyExchange,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = "سعر الصرف (${selectedCurrency.symbol} مقابل YER)",
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    // Quick decrement
+                                    Surface(
+                                        onClick = {
+                                            useCustomRate = true
+                                            val currentR = customRateInput.toDoubleOrNull() ?: effectiveRate
+                                            val newR = (currentR - 1.0).coerceAtLeast(0.1)
+                                            customRateInput = if (newR % 1.0 == 0.0) newR.toLong().toString() else "%.2f".format(newR)
+                                        },
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = MaterialTheme.colorScheme.surfaceVariant,
+                                        border = BorderStroke(0.6.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)),
+                                        modifier = Modifier.size(26.dp)
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Text("-1", fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                                        }
+                                    }
+
+                                    // Quick increment
+                                    Surface(
+                                        onClick = {
+                                            useCustomRate = true
+                                            val currentR = customRateInput.toDoubleOrNull() ?: effectiveRate
+                                            val newR = currentR + 1.0
+                                            customRateInput = if (newR % 1.0 == 0.0) newR.toLong().toString() else "%.2f".format(newR)
+                                        },
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = MaterialTheme.colorScheme.surfaceVariant,
+                                        border = BorderStroke(0.6.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)),
+                                        modifier = Modifier.size(26.dp)
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Text("+1", fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                                        }
+                                    }
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                OutlinedTextField(
+                                    value = if (useCustomRate) customRateInput else (if (effectiveRate % 1.0 == 0.0) effectiveRate.toLong().toString() else effectiveRate.toString()),
+                                    onValueChange = {
+                                        useCustomRate = true
+                                        customRateInput = it.filter { ch -> ch.isDigit() || ch == '.' }
+                                    },
+                                    label = { Text("سعر الصرف المرن", fontSize = 10.sp) },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(8.dp),
+                                    textStyle = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                                    modifier = Modifier.weight(1f)
+                                )
+
+                                if (useCustomRate) {
+                                    TextButton(
+                                        onClick = {
+                                            useCustomRate = false
+                                            val defRate = if (selectedCurrency == AppCurrency.SAR) exchangeRate else selectedCurrency.defaultRateYer
+                                            customRateInput = if (defRate % 1.0 == 0.0) defRate.toLong().toString() else defRate.toString()
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                                    ) {
+                                        Text("استعادة الافتراضي", fontSize = 9.5.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Cash Box & Deduction Options (خيار الإضافة للصندوق والخصم من النقد)
+                if (showDeductFromCashOption || selectedCurrency != AppCurrency.YER) {
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (!deductFromCash) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.35f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        border = BorderStroke(1.dp, if (!deductFromCash) MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = "تأثير البند على النقد والصندوق:",
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.5.sp),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                // Option 1: Direct to Cash Box (إضافة للصندوق مباشرة)
+                                FilterChip(
+                                    selected = !deductFromCash,
+                                    onClick = { deductFromCash = false },
+                                    label = {
+                                        Text(
+                                            text = "💼 إضافة للصندوق (بدون خصم)",
+                                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = if (!deductFromCash) FontWeight.Bold else FontWeight.Normal, fontSize = 10.sp)
+                                        )
+                                    },
+                                    leadingIcon = if (!deductFromCash) {
+                                        { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(13.dp)) }
+                                    } else null,
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        selectedLabelColor = MaterialTheme.colorScheme.secondary
+                                    ),
+                                    modifier = Modifier.weight(1f)
+                                )
+
+                                // Option 2: Deduct from Cash (خصم من النقد الفعلي)
+                                FilterChip(
+                                    selected = deductFromCash,
+                                    onClick = { deductFromCash = true },
+                                    label = {
+                                        Text(
+                                            text = "🔻 خصم من النقد",
+                                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = if (deductFromCash) FontWeight.Bold else FontWeight.Normal, fontSize = 10.sp)
+                                        )
+                                    },
+                                    leadingIcon = if (deductFromCash) {
+                                        { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(13.dp)) }
+                                    } else null,
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                                        selectedLabelColor = MaterialTheme.colorScheme.error
+                                    ),
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Checkbox toggle for optional fields (Notes & Statement) - Hidden by default
                 Row(
                     modifier = Modifier
@@ -1246,69 +1428,6 @@ fun CashDirectEntryDialog(
                             textStyle = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.fillMaxWidth()
                         )
-
-                        if (selectedCurrency != AppCurrency.YER) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("سعر صرف مخصص لهذا البند", style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp))
-                                Switch(
-                                    checked = useCustomRate,
-                                    onCheckedChange = {
-                                        useCustomRate = it
-                                        if (it && customRateInput.isBlank()) {
-                                            val defRate = if (selectedCurrency == AppCurrency.SAR) exchangeRate else selectedCurrency.defaultRateYer
-                                            customRateInput = if (defRate % 1.0 == 0.0) defRate.toLong().toString() else defRate.toString()
-                                        }
-                                    }
-                                )
-                            }
-
-                            if (useCustomRate) {
-                                OutlinedTextField(
-                                    value = customRateInput,
-                                    onValueChange = { customRateInput = it.filter { ch -> ch.isDigit() || ch == '.' } },
-                                    label = { Text("سعر الصرف المخصص", fontSize = 11.sp) },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(8.dp),
-                                    textStyle = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-
-                        if (showDeductFromCashOption) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { deductFromCash = !deductFromCash }
-                                    .background(
-                                        if (deductFromCash) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f)
-                                        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                                        RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    checked = deductFromCash,
-                                    onCheckedChange = { deductFromCash = it }
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Column {
-                                    Text(
-                                        text = "الخصم من النقد",
-                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp)
-                                    )
-                                    Text(
-                                        text = "يخصم المبلغ من النقد مباشرة بعد الصرف.",
-                                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.outline, fontSize = 9.5.sp)
-                                    )
-                                }
-                            }
-                        }
                     }
                 }
             }

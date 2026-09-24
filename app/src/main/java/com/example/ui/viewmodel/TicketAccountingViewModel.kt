@@ -53,139 +53,126 @@ data class AppThemePreset(
 )
 
 val PRESET_APP_THEMES = listOf(
-    // ☀️ DAY THEMES (السمات النهارية أولاً)
+    // ☀️ DAY THEMES (السمات النهارية المتدرجة والمشرقة للمحاسبة)
     AppThemePreset(
-        name = "⚙️ فولاذ",
-        description = "السمة النهارية الافتراضية: سمة فاخرة بدرجات الفولاذ الفضي والستيل المضيء عالي الوضوح",
-        primaryColor = 0xFF475569,
-        headerBgColor = 0xFFE2E8F0,
-        headerTextColor = 0xFF0F172A,
-        borderColor = 0xFF94A3B8,
-        calculatorColor = 0xFF334155,
-        activeTabColor = 0xFF475569,
-        previewGradient = listOf(0xFFE2E8F0, 0xFF64748B),
+        name = "💎 ياقوت أزرق (الافتراضي)",
+        description = "السمة النهارية الافتراضية: مظهر ياقوتي ملكي متدرج للمحاسبة مع خلفية لؤلؤية نقية عالية التباين",
+        primaryColor = 0xFF1E40AF,
+        headerBgColor = 0xFFEFF6FF,
+        headerTextColor = 0xFF1E3A8A,
+        borderColor = 0xFF93C5FD,
+        calculatorColor = 0xFF1D4ED8,
+        activeTabColor = 0xFF1E40AF,
+        previewGradient = listOf(0xFF1E40AF, 0xFF3B82F6),
         isNightMode = false,
-        bgStyle = "METALLIC_STEEL"
+        bgStyle = "DEFAULT"
     ),
     AppThemePreset(
-        name = "🐅 الاتحاد",
-        description = "مظهر رياضي ملكي ناصع بألوان نادي الاتحاد السعودي الأصيلة: الأصفر الذهبي والأسود الفخم",
-        primaryColor = 0xFFEAB308,
-        headerBgColor = 0xFFFEF9C3,
-        headerTextColor = 0xFF18181B,
-        borderColor = 0xFFEAB308,
-        calculatorColor = 0xFF18181B,
-        activeTabColor = 0xFFEAB308,
-        previewGradient = listOf(0xFFFEF08A, 0xFF18181B),
-        isNightMode = false,
-        bgStyle = "TEXTURE_CARBON_FIBER"
-    ),
-    AppThemePreset(
-        name = "💎 الزمرد",
-        description = "مظهر نهاري عصري ومنعش بتدرجات الزمرد والنعناع المريح للعين مع أبيض ناصع",
+        name = "💵 زمرد السيولة",
+        description = "مظهر نهاري منعش بتدرجات الزمرد النقدي وأوراق العملة الخضراء المتناسقة مع الصندوق",
         primaryColor = 0xFF059669,
         headerBgColor = 0xFFECFDF5,
         headerTextColor = 0xFF065F46,
-        borderColor = 0xFF10B981,
+        borderColor = 0xFF6EE7B7,
         calculatorColor = 0xFF047857,
         activeTabColor = 0xFF059669,
-        previewGradient = listOf(0xFFECFDF5, 0xFF10B981),
+        previewGradient = listOf(0xFF047857, 0xFF10B981),
         isNightMode = false,
-        bgStyle = "TEXTURE_GRANULAR_WALL"
+        bgStyle = "DEFAULT"
     ),
     AppThemePreset(
-        name = "🌊 محيط",
-        description = "مظهر نهاري أنيق وعصري بدرجات الأزرق المحيطي والأزرق الفيروزي النقي",
-        primaryColor = 0xFF0284C7,
-        headerBgColor = 0xFFF0F9FF,
-        headerTextColor = 0xFF0369A1,
-        borderColor = 0xFF38BDF8,
-        calculatorColor = 0xFF0284C7,
-        activeTabColor = 0xFF0284C7,
-        previewGradient = listOf(0xFFF0F9FF, 0xFF0284C7),
-        isNightMode = false,
-        bgStyle = "TEXTURE_GRANULAR_WALL"
-    ),
-    AppThemePreset(
-        name = "🌸 الورد",
-        description = "مظهر نهاري ناعم بتدرجات الوردي والمارون الهادئ بتباين راقٍ",
-        primaryColor = 0xFFE11D48,
-        headerBgColor = 0xFFFFF1F2,
-        headerTextColor = 0xFF9F1239,
-        borderColor = 0xFFFB7185,
-        calculatorColor = 0xFFBE123C,
-        activeTabColor = 0xFFE11D48,
-        previewGradient = listOf(0xFFFFF1F2, 0xFFE11D48),
-        isNightMode = false,
-        bgStyle = "TEXTURE_GRANULAR_WALL"
-    ),
-    AppThemePreset(
-        name = "🏛️ معماري",
-        description = "مظهر جداري إسمنتي محبب ناعم وعصري بطابع معماري مريح للبصر",
-        primaryColor = 0xFF475569,
-        headerBgColor = 0xFFF1F5F9,
-        headerTextColor = 0xFF1E293B,
-        borderColor = 0xFF94A3B8,
-        calculatorColor = 0xFF334155,
-        activeTabColor = 0xFF475569,
-        previewGradient = listOf(0xFFF1F5F9, 0xFF475569),
-        isNightMode = false,
-        bgStyle = "TEXTURE_GRANULAR_WALL"
-    ),
-    AppThemePreset(
-        name = "🪵 خشب",
-        description = "خشب الجوز والأرو الفاخر بتدرجات البني الدافئ والنقوش الخشبية الراقية",
-        primaryColor = 0xFF8D6E63,
-        headerBgColor = 0xFFEFEBE9,
-        headerTextColor = 0xFF3E2723,
-        borderColor = 0xFF8D6E63,
-        calculatorColor = 0xFF4E342E,
-        activeTabColor = 0xFF5D4037,
-        previewGradient = listOf(0xFF4E342E, 0xFF8D6E63),
-        isNightMode = false,
-        bgStyle = "TEXTURE_WOOD_GRAIN"
-    ),
-    AppThemePreset(
-        name = "⚙️ فولاذ 2",
-        description = "سمة فاخرة بدرجات الفولاذ الفضي والستيل المضيء",
-        primaryColor = 0xFF475569,
-        headerBgColor = 0xFFE2E8F0,
-        headerTextColor = 0xFF0F172A,
-        borderColor = 0xFF94A3B8,
-        calculatorColor = 0xFF334155,
-        activeTabColor = 0xFF475569,
-        previewGradient = listOf(0xFFE2E8F0, 0xFF64748B),
-        isNightMode = false,
-        bgStyle = "METALLIC_STEEL"
-    ),
-    AppThemePreset(
-        name = "🪙 ذهب",
-        description = "خلفية وواجهة برّاقة بتدرجات الذهب الخالص والبرونز الفاخر",
-        primaryColor = 0xFFB45309,
-        headerBgColor = 0xFFFEF3C7,
+        name = "🪙 ذهب محاسبي",
+        description = "مظهر نهاري دافئ وفخم بتدرجات الذهب الأصفر والعنبر المحاسبي الراقي",
+        primaryColor = 0xFFD97706,
+        headerBgColor = 0xFFFFFBEB,
         headerTextColor = 0xFF78350F,
-        borderColor = 0xFFF59E0B,
-        calculatorColor = 0xFF92400E,
+        borderColor = 0xFFFCD34D,
+        calculatorColor = 0xFFB45309,
         activeTabColor = 0xFFD97706,
-        previewGradient = listOf(0xFFFEF3C7, 0xFFD97706),
+        previewGradient = listOf(0xFFB45309, 0xFFF59E0B),
         isNightMode = false,
         bgStyle = "METALLIC_GOLD"
     ),
     AppThemePreset(
-        name = "🥈 فضة",
-        description = "طابع ناصع وأنيق بتدرجات الفضة والكروم المصقول",
-        primaryColor = 0xFF64748B,
-        headerBgColor = 0xFFF8FAFC,
-        headerTextColor = 0xFF1E293B,
-        borderColor = 0xFFCBD5E1,
-        calculatorColor = 0xFF475569,
-        activeTabColor = 0xFF64748B,
-        previewGradient = listOf(0xFFFFFFFF, 0xFF94A3B8),
+        name = "🌊 فيروز مالي",
+        description = "مظهر نهاري متدرج بدرجات الأزرق المحيطي والفيروز النقي المريح للعين أثناء العمل الطويل",
+        primaryColor = 0xFF0284C7,
+        headerBgColor = 0xFFF0F9FF,
+        headerTextColor = 0xFF0C4A6E,
+        borderColor = 0xFF7DD3FC,
+        calculatorColor = 0xFF0369A1,
+        activeTabColor = 0xFF0284C7,
+        previewGradient = listOf(0xFF0284C7, 0xFF06B6D4),
+        isNightMode = false,
+        bgStyle = "DEFAULT"
+    ),
+    AppThemePreset(
+        name = "🌸 عقيق وردي",
+        description = "مظهر نهاري أنيق بتدرجات العقيق والياقوت الوردي المتناسق",
+        primaryColor = 0xFFE11D48,
+        headerBgColor = 0xFFFFF1F2,
+        headerTextColor = 0xFF881337,
+        borderColor = 0xFFFDA4AF,
+        calculatorColor = 0xFFBE123C,
+        activeTabColor = 0xFFE11D48,
+        previewGradient = listOf(0xFFBE123C, 0xFFFB7185),
+        isNightMode = false,
+        bgStyle = "DEFAULT"
+    ),
+    AppThemePreset(
+        name = "🐅 نادي الاتحاد",
+        description = "مظهر نهاري رياضي مشرق بألوان العميد الذهبية الصفراء بتطريز كربوني فاخر",
+        primaryColor = 0xFFEAB308,
+        headerBgColor = 0xFFFEF9C3,
+        headerTextColor = 0xFF713F12,
+        borderColor = 0xFFFDE047,
+        calculatorColor = 0xFFCA8A04,
+        activeTabColor = 0xFFEAB308,
+        previewGradient = listOf(0xFFCA8A04, 0xFFFACC15),
+        isNightMode = false,
+        bgStyle = "TEXTURE_CARBON_FIBER"
+    ),
+    AppThemePreset(
+        name = "🏛️ بلاتين ملكي",
+        description = "مظهر فاخر بتدرجات النيلي والبلاتين الملكي المضيء عالي الاحترافية",
+        primaryColor = 0xFF4F46E5,
+        headerBgColor = 0xFFEEF2FF,
+        headerTextColor = 0xFF312E81,
+        borderColor = 0xFFA5B4FC,
+        calculatorColor = 0xFF4338CA,
+        activeTabColor = 0xFF4F46E5,
+        previewGradient = listOf(0xFF4338CA, 0xFF6366F1),
         isNightMode = false,
         bgStyle = "METALLIC_SILVER"
     ),
     AppThemePreset(
-        name = "🧱 برونز",
+        name = "🪵 خشب الأرو",
+        description = "خشب الجوز والأرو الفاخر بتدرجات البني الدافئ والنقوش الطبيعية الراقية",
+        primaryColor = 0xFF8D6E63,
+        headerBgColor = 0xFFEFEBE9,
+        headerTextColor = 0xFF3E2723,
+        borderColor = 0xFFBCAAA4,
+        calculatorColor = 0xFF6D4C41,
+        activeTabColor = 0xFF8D6E63,
+        previewGradient = listOf(0xFF6D4C41, 0xFF8D6E63),
+        isNightMode = false,
+        bgStyle = "TEXTURE_WOOD_GRAIN"
+    ),
+    AppThemePreset(
+        name = "🥈 فضة بلاتينية",
+        description = "طابع ناصع وأنيق بتدرجات الفضة والكروم المصقول المضيء",
+        primaryColor = 0xFF2563EB,
+        headerBgColor = 0xFFF8FAFC,
+        headerTextColor = 0xFF1E293B,
+        borderColor = 0xFF93C5FD,
+        calculatorColor = 0xFF1D4ED8,
+        activeTabColor = 0xFF2563EB,
+        previewGradient = listOf(0xFFFFFFFF, 0xFF93C5FD),
+        isNightMode = false,
+        bgStyle = "METALLIC_SILVER"
+    ),
+    AppThemePreset(
+        name = "🧱 برونز دافئ",
         description = "مظهر نحاسي فاخر بالدرجات الأنيقة والدافئة",
         primaryColor = 0xFFC2410C,
         headerBgColor = 0xFFFFEDD5,
@@ -704,7 +691,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         val db = AppDatabase.getDatabase(application)
         repository = DailySalesRepository(db.dailySalesDao())
         
-        val initialThemePreset = sharedPreferences.getString("selectedThemePresetName", "⚙️ سمة الفولاذ المصقول (الافتراضي)") ?: "⚙️ سمة الفولاذ المصقول (الافتراضي)"
+        val initialThemePreset = sharedPreferences.getString("selectedThemePresetName", "السمة الليلية الفائقة (تيتانيوم)") ?: "السمة الليلية الفائقة (تيتانيوم)"
         val initialHijriAdj = sharedPreferences.getInt("hijriAdjustmentDays", 0)
         val initialRemainingStepper = sharedPreferences.getBoolean("showRemainingStepper", true)
         val initialBudgetSummaryBar = sharedPreferences.getBoolean("showBudgetSummaryBar", true)
@@ -715,7 +702,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
         val initialClosedDayTs = sharedPreferences.getLong("closed_day_timestamp", 0L)
         val initialScheduledResetTime = sharedPreferences.getString("scheduledResetTime", "03:00") ?: "03:00"
         val initialAccountingDayStartHour = sharedPreferences.getInt("accountingDayStartHour", 0)
-        val initialIsAutoDailyResetEnabled = sharedPreferences.getBoolean("isAutoDailyResetEnabled", true)
+        val initialIsAutoDailyResetEnabled = sharedPreferences.getBoolean("isAutoDailyResetEnabled", false)
         val initialTableCardAlpha = sharedPreferences.getFloat("tableCardAlpha", 1.0f)
         val initialTableHeaderAlpha = sharedPreferences.getFloat("tableHeaderAlpha", 1.0f)
         val initialTableCellAlpha = sharedPreferences.getFloat("tableCellAlpha", 1.0f)
@@ -3846,7 +3833,7 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun checkAndPerformAutoResetIfNeeded(forceManual: Boolean = false) {
-        val isEnabled = sharedPreferences.getBoolean("isAutoDailyResetEnabled", true)
+        val isEnabled = sharedPreferences.getBoolean("isAutoDailyResetEnabled", false)
         if (!isEnabled && !forceManual) return
 
         val scheduledTime = _uiState.value.scheduledResetTime.ifBlank { "03:00" }
@@ -4784,9 +4771,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                 }
             }
 
-            repository.insertOrUpdateCategoryItems(allCategoryItems)
-            repository.insertOrUpdateDirectEntries(allDirectEntries)
-
             // Save Cash Groups
             val cashGroupEntities = state.cashGroups.map { cg ->
                 CashBoxGroupEntity(
@@ -4798,7 +4782,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                     isDefault = cg.isDefault
                 )
             }
-            repository.insertOrUpdateCashBoxGroups(cashGroupEntities)
 
             // Save Cash items
             val allCashDenoms = mutableListOf<CashBoxDenomItemEntity>()
@@ -4837,9 +4820,6 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                 }
             }
 
-            repository.insertOrUpdateCashDenoms(allCashDenoms)
-            repository.insertOrUpdateCashDirects(allCashDirects)
-
             // Save Expenses
             val expenseEntities = state.expenses.mapIndexed { idx, exp ->
                 CashExpenseEntity(
@@ -4856,7 +4836,18 @@ class TicketAccountingViewModel(application: Application) : AndroidViewModel(app
                     orderIndex = idx
                 )
             }
-            repository.insertOrUpdateExpenses(expenseEntities)
+
+            // Save atomically to database via single transaction
+            repository.saveDailySales(
+                sales = entity,
+                groups = groupEntities,
+                items = allCategoryItems,
+                directEntries = allDirectEntries,
+                cashGroups = cashGroupEntities,
+                cashDenoms = allCashDenoms,
+                cashDirects = allCashDirects,
+                expenses = expenseEntities
+            )
         }
     }
 

@@ -129,23 +129,63 @@ object ColorPresetsRegistry {
     val presets = listOf(
         // ==================== ☀️ السمات النهارية ====================
         ColorThemePreset(
-            name = "⚙️ سمة الفولاذ المصقول المعدني (الافتراضي)",
-            description = "السمة النهارية الافتراضية: مظهر معدني فاخر بدرجات الفولاذ الفضي والستيل المضيء عالي الوضوح",
-            primaryColor = Color(0xFF475569),
-            secondaryColor = Color(0xFF334155),
+            name = "💎 سمة الياقوت الأزرق المالي (الافتراضي)",
+            description = "السمة النهارية الافتراضية: مظهر ياقوتي ملكي متدرج للمحاسبة مع خلفية لؤلؤية نقية عالية التباين وراحة البصر",
+            primaryColor = Color(0xFF1E40AF),
+            secondaryColor = Color(0xFF3B82F6),
             isNightMode = false,
             isSeasonal = false,
-            seasonBadge = "الافتراضي ⚙️",
+            seasonBadge = "الافتراضي 💎",
             state = CustomColorThemeState(
-                topAppBarBg = 0xFF475569,
+                topAppBarBg = 0xFF1E40AF,
                 topAppBarText = 0xFFFFFFFF,
-                tableHeaderBg = 0xFFE2E8F0,
-                tableHeaderText = 0xFF0F172A,
-                tableBorderColor = 0xFF94A3B8,
+                tableHeaderBg = 0xFFEFF6FF,
+                tableHeaderText = 0xFF1E3A8A,
+                tableBorderColor = 0xFF93C5FD,
                 tableCardBg = 0xFFFFFFFF,
-                groupActiveTabBg = 0xFF475569,
+                groupActiveTabBg = 0xFF1E40AF,
                 groupActiveTabText = 0xFFFFFFFF,
-                appBorderColor = 0xFF94A3B8
+                appBorderColor = 0xFF93C5FD
+            )
+        ),
+        ColorThemePreset(
+            name = "💵 سمة زمرد السيولة النقدية",
+            description = "مظهر نهاري منعش بتدرجات الزمرد النقدي وأوراق العملة الخضراء المتناسقة مع الصندوق",
+            primaryColor = Color(0xFF059669),
+            secondaryColor = Color(0xFF10B981),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "زمرد السيولة 💵",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFF059669,
+                topAppBarText = 0xFFFFFFFF,
+                tableHeaderBg = 0xFFECFDF5,
+                tableHeaderText = 0xFF065F46,
+                tableBorderColor = 0xFF6EE7B7,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFF059669,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFF6EE7B7
+            )
+        ),
+        ColorThemePreset(
+            name = "🪙 سمة الذهب المحاسبي",
+            description = "مظهر نهاري دافئ وفخم بتدرجات الذهب الأصفر والعنبر المحاسبي الراقي",
+            primaryColor = Color(0xFFD97706),
+            secondaryColor = Color(0xFFF59E0B),
+            isNightMode = false,
+            isSeasonal = false,
+            seasonBadge = "ذهب محاسبي 🪙",
+            state = CustomColorThemeState(
+                topAppBarBg = 0xFFD97706,
+                topAppBarText = 0xFFFFFFFF,
+                tableHeaderBg = 0xFFFFFBEB,
+                tableHeaderText = 0xFF78350F,
+                tableBorderColor = 0xFFFCD34D,
+                tableCardBg = 0xFFFFFFFF,
+                groupActiveTabBg = 0xFFD97706,
+                groupActiveTabText = 0xFFFFFFFF,
+                appBorderColor = 0xFFFCD34D
             )
         ),
         ColorThemePreset(
@@ -169,23 +209,23 @@ object ColorPresetsRegistry {
             )
         ),
         ColorThemePreset(
-            name = "🏛️ سمة حجر الجرانيت الصخري",
-            description = "مظهر صخري جرانيتي طبيعي متين بدرجات الرمادي والصلابة الحجرية الأنيقة",
-            primaryColor = Color(0xFF64748B),
-            secondaryColor = Color(0xFF475569),
+            name = "🌊 سمة الفيروز المالي",
+            description = "مظهر نهاري متدرج بدرجات الأزرق المحيطي والفيروز النقي المريح للعين أثناء العمل الطويل",
+            primaryColor = Color(0xFF0284C7),
+            secondaryColor = Color(0xFF06B6D4),
             isNightMode = false,
             isSeasonal = false,
-            seasonBadge = "جرانيت صخري 🏛️",
+            seasonBadge = "فيروز مالي 🌊",
             state = CustomColorThemeState(
-                topAppBarBg = 0xFF475569,
-                topAppBarText = 0xFFF8FAFC,
-                tableHeaderBg = 0xFFE2E8F0,
-                tableHeaderText = 0xFF1E293B,
-                tableBorderColor = 0xFF94A3B8,
+                topAppBarBg = 0xFF0284C7,
+                topAppBarText = 0xFFFFFFFF,
+                tableHeaderBg = 0xFFF0F9FF,
+                tableHeaderText = 0xFF0C4A6E,
+                tableBorderColor = 0xFF7DD3FC,
                 tableCardBg = 0xFFFFFFFF,
-                groupActiveTabBg = 0xFF475569,
+                groupActiveTabBg = 0xFF0284C7,
                 groupActiveTabText = 0xFFFFFFFF,
-                appBorderColor = 0xFF94A3B8
+                appBorderColor = 0xFF7DD3FC
             )
         ),
         ColorThemePreset(

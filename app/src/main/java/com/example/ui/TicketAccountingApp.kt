@@ -321,7 +321,7 @@ fun TicketAccountingApp(
                     )
                 )
                 "CUSTOM_COLOR" -> Modifier.background(Color(uiState.appBackgroundColor))
-                else -> Modifier
+                else -> Modifier.background(DesignSystem.appBackgroundGradient(isDark))
             }
 
             Box(
@@ -338,7 +338,7 @@ fun TicketAccountingApp(
                     )
             ) {
                 Scaffold(
-                    containerColor = if (uiState.appBackgroundStyle != "DEFAULT") Color.Transparent else MaterialTheme.colorScheme.background,
+                    containerColor = Color.Transparent,
                     topBar = {
                     if (currentScreen != AppScreen.SPLASH && currentScreen != AppScreen.ONBOARDING) {
                         Surface(
@@ -348,9 +348,15 @@ fun TicketAccountingApp(
                                     shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
                                     elevation = 8.dp,
                                     isDark = isDark,
-                                    baseColor = MaterialTheme.colorScheme.surface
+                                    gradientBrush = DesignSystem.topBarGradient(isDark, accent = MaterialTheme.colorScheme.primary)
                                 ),
-                            shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+                            shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                            color = Color.Transparent,
+                            border = BorderStroke(
+                                1.dp,
+                                if (isDark) MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                                else MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                            )
                         ) {
                             TopAppBar(
                                 title = {
@@ -370,126 +376,209 @@ fun TicketAccountingApp(
                                             style = MaterialTheme.typography.titleMedium.copy(
                                                 fontWeight = FontWeight.ExtraBold,
                                                 fontSize = 17.sp
-                                            )
+                                            ),
+                                            color = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 },
                                 actions = {
-                                    // Reset Shift & Scope Options Button (تصفير الوردية والبيانات)
-                                    var showTopBarResetMenu by remember { mutableStateOf(false) }
-                                    Box {
-                                        IconButton(
-                                            onClick = { showTopBarResetMenu = true },
-                                            modifier = Modifier.testTag("top_bar_reset_toggle")
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.RestartAlt,
-                                                contentDescription = "خيارات تصفير الوردية والبيانات",
-                                                tint = MaterialTheme.colorScheme.error.copy(alpha = 0.85f)
-                                            )
-                                        }
-
-                                        DropdownMenu(
-                                            expanded = showTopBarResetMenu,
-                                            onDismissRequest = { showTopBarResetMenu = false }
-                                        ) {
-                                            DropdownMenuItem(
-                                                text = {
-                                                    Column {
-                                                        Text("تصفير الوردية الحالية", fontWeight = FontWeight.Bold, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
-                                                        Text("مع الرسوم المتحركة والتأكيد البصري", fontSize = 10.sp, color = MaterialTheme.colorScheme.outline)
-                                                    }
-                                                },
-                                                leadingIcon = {
-                                                    Icon(Icons.Default.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                                                },
-                                                onClick = {
-                                                    showTopBarResetMenu = false
-                                                    viewModel.openShiftResetDialog()
-                                                }
-                                            )
-                                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                                            DropdownMenuItem(
-                                                text = {
-                                                    Column {
-                                                        Text("تصفير مخصص وتحديد الخانات", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
-                                                        Text("تحديد مجموعات أو فئات معينة فقط", fontSize = 10.sp, color = MaterialTheme.colorScheme.outline)
-                                                    }
-                                                },
-                                                leadingIcon = {
-                                                    Icon(Icons.Default.Tune, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                                                },
-                                                onClick = {
-                                                    showTopBarResetMenu = false
-                                                    showGlobalResetDialog = true
-                                                }
-                                            )
-                                        }
-                                    }
-
-                                    // Day / Night Theme Toggle Button
-                                    IconButton(
-                                        onClick = { viewModel.toggleTheme() },
-                                        modifier = Modifier.testTag("top_bar_theme_toggle")
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                        modifier = Modifier.padding(end = 6.dp)
                                     ) {
-                                        Icon(
-                                             imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
-                                            contentDescription = if (isDarkTheme) AppStrings.get("light_mode", lang) else AppStrings.get("dark_mode", lang),
-                                            tint = if (isDarkTheme) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-
-                                    // Side Category Calculator Button
-                                    IconButton(
-                                        onClick = { showCategoryCalculatorDialog = true },
-                                        modifier = Modifier.testTag("top_bar_calculator_toggle")
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Calculate,
-                                            contentDescription = "آلة حاسبة الفئات الجانبية",
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-
-                                    // Close Day Button / Day Closed Indicator (زر إغلاق اليوم / حالة إغلاق اليوم)
-                                    if (uiState.isDayClosed) {
-                                        Surface(
-                                            shape = RoundedCornerShape(20.dp),
-                                            color = MaterialTheme.colorScheme.errorContainer,
-                                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-                                            modifier = Modifier
-                                                .padding(horizontal = 4.dp)
-                                                .clickable { viewModel.requestCloseDay() }
-                                                .testTag("top_bar_day_closed_badge")
-                                        ) {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                        // Reset Shift & Scope Options Button (تصفير الوردية والبيانات)
+                                        var showTopBarResetMenu by remember { mutableStateOf(false) }
+                                        Box {
+                                            Surface(
+                                                shape = RoundedCornerShape(10.dp),
+                                                color = if (isDark) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f)
+                                                       else MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.70f),
+                                                border = BorderStroke(
+                                                    1.dp,
+                                                    MaterialTheme.colorScheme.error.copy(alpha = if (isDark) 0.5f else 0.7f)
+                                                ),
+                                                modifier = Modifier.size(38.dp)
                                             ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Lock,
-                                                    contentDescription = "اليوم مغلق",
-                                                    tint = MaterialTheme.colorScheme.error,
-                                                    modifier = Modifier.size(16.dp)
+                                                IconButton(
+                                                    onClick = { showTopBarResetMenu = true },
+                                                    modifier = Modifier.size(38.dp).testTag("top_bar_reset_toggle")
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.RestartAlt,
+                                                        contentDescription = "خيارات تصفير الوردية والبيانات",
+                                                        tint = MaterialTheme.colorScheme.error,
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
+                                                }
+                                            }
+
+                                            DropdownMenu(
+                                                expanded = showTopBarResetMenu,
+                                                onDismissRequest = { showTopBarResetMenu = false }
+                                            ) {
+                                                DropdownMenuItem(
+                                                    text = {
+                                                        Column {
+                                                            Text("تصفير الوردية الحالية", fontWeight = FontWeight.Bold, fontSize = 12.5.sp, color = MaterialTheme.colorScheme.error)
+                                                            Text("مع الرسوم المتحركة والتأكيد البصري", fontSize = 10.sp, color = MaterialTheme.colorScheme.outline)
+                                                        }
+                                                    },
+                                                    leadingIcon = {
+                                                        Icon(Icons.Default.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                                                    },
+                                                    onClick = {
+                                                        showTopBarResetMenu = false
+                                                        viewModel.openShiftResetDialog()
+                                                    }
                                                 )
-                                                Spacer(modifier = Modifier.width(4.dp))
-                                                Text(
-                                                    text = "اليوم مغلق",
-                                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                                                DropdownMenuItem(
+                                                    text = {
+                                                        Column {
+                                                            Text("تصفير مخصص وتحديد الخانات", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                                            Text("تحديد مجموعات أو فئات معينة فقط", fontSize = 10.sp, color = MaterialTheme.colorScheme.outline)
+                                                        }
+                                                    },
+                                                    leadingIcon = {
+                                                        Icon(Icons.Default.Tune, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                                    },
+                                                    onClick = {
+                                                        showTopBarResetMenu = false
+                                                        showGlobalResetDialog = true
+                                                    }
                                                 )
                                             }
                                         }
-                                    } else {
-                                        IconButton(
-                                            onClick = { viewModel.requestCloseDay() },
-                                            modifier = Modifier.testTag("top_bar_close_day_button")
+
+                                        // Side Category Calculator Button
+                                        Surface(
+                                            shape = RoundedCornerShape(10.dp),
+                                            color = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                                                   else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.80f),
+                                            border = BorderStroke(
+                                                1.dp,
+                                                MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.35f else 0.65f)
+                                            ),
+                                            modifier = Modifier.size(38.dp)
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Default.LockClock,
-                                                contentDescription = AppStrings.get("close_day", lang),
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
+                                            IconButton(
+                                                onClick = { showCategoryCalculatorDialog = true },
+                                                modifier = Modifier.size(38.dp).testTag("top_bar_calculator_toggle")
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Calculate,
+                                                    contentDescription = "آلة حاسبة الفئات الجانبية",
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                            }
+                                        }
+
+                                        // Lock Given & Extra Button (زر إقفال المعطى والإضافي)
+                                        Surface(
+                                            shape = RoundedCornerShape(10.dp),
+                                            color = if (uiState.isLockGivenExtraMode) MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.85f)
+                                                   else if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                                                   else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.80f),
+                                            border = BorderStroke(
+                                                1.dp,
+                                                if (uiState.isLockGivenExtraMode) MaterialTheme.colorScheme.tertiary
+                                                else MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.35f else 0.65f)
+                                            ),
+                                            modifier = Modifier.size(38.dp)
+                                        ) {
+                                            IconButton(
+                                                onClick = { viewModel.toggleLockGivenExtraMode() },
+                                                modifier = Modifier.size(38.dp).testTag("top_bar_lock_given_toggle")
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (uiState.isLockGivenExtraMode) Icons.Default.Lock else Icons.Default.LockOpen,
+                                                    contentDescription = if (uiState.isLockGivenExtraMode) "المعطى مقفل" else "قفل المعطى",
+                                                    tint = if (uiState.isLockGivenExtraMode) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                            }
+                                        }
+
+                                        // Read-Only / Block Input Button (زر منع الإدخال والقراءة فقط)
+                                        Surface(
+                                            shape = RoundedCornerShape(10.dp),
+                                            color = if (uiState.isReadOnlyMode) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.85f)
+                                                   else if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                                                   else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.80f),
+                                            border = BorderStroke(
+                                                1.dp,
+                                                if (uiState.isReadOnlyMode) MaterialTheme.colorScheme.error
+                                                else MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.35f else 0.65f)
+                                            ),
+                                            modifier = Modifier.size(38.dp)
+                                        ) {
+                                            IconButton(
+                                                onClick = { viewModel.toggleReadOnlyMode() },
+                                                modifier = Modifier.size(38.dp).testTag("top_bar_read_only_toggle")
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (uiState.isReadOnlyMode) Icons.Default.EditOff else Icons.Default.Edit,
+                                                    contentDescription = if (uiState.isReadOnlyMode) "الإدخال ممنوع (قراءة فقط)" else "منع الإدخال",
+                                                    tint = if (uiState.isReadOnlyMode) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                            }
+                                        }
+
+                                        // Close Day Button / Day Closed Indicator (زر إغلاق اليوم / حالة إغلاق اليوم)
+                                        if (uiState.isDayClosed) {
+                                            Surface(
+                                                shape = RoundedCornerShape(10.dp),
+                                                color = MaterialTheme.colorScheme.errorContainer,
+                                                border = BorderStroke(1.2.dp, MaterialTheme.colorScheme.error),
+                                                modifier = Modifier
+                                                    .height(38.dp)
+                                                    .clickable { viewModel.requestCloseDay() }
+                                                    .testTag("top_bar_day_closed_badge")
+                                            ) {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Lock,
+                                                        contentDescription = "اليوم مغلق",
+                                                        tint = MaterialTheme.colorScheme.error,
+                                                        modifier = Modifier.size(16.dp)
+                                                    )
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                    Text(
+                                                        text = "اليوم مغلق",
+                                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                                    )
+                                                }
+                                            }
+                                        } else {
+                                            Surface(
+                                                shape = RoundedCornerShape(10.dp),
+                                                color = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                                                       else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.80f),
+                                                border = BorderStroke(
+                                                    1.dp,
+                                                    MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.35f else 0.65f)
+                                                ),
+                                                modifier = Modifier.size(38.dp)
+                                            ) {
+                                                IconButton(
+                                                    onClick = { viewModel.requestCloseDay() },
+                                                    modifier = Modifier.size(38.dp).testTag("top_bar_close_day_button")
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.LockClock,
+                                                        contentDescription = AppStrings.get("close_day", lang),
+                                                        tint = MaterialTheme.colorScheme.primary,
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 },
@@ -511,15 +600,30 @@ fun TicketAccountingApp(
                                     shape = RoundedCornerShape(20.dp),
                                     elevation = 8.dp,
                                     isDark = isDark,
-                                    baseColor = MaterialTheme.colorScheme.surface
+                                    gradientBrush = DesignSystem.navBarGradient(isDark, accent = MaterialTheme.colorScheme.primary)
                                 ),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color.Transparent,
+                            border = BorderStroke(
+                                1.2.dp,
+                                if (isDark) MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                                else MaterialTheme.colorScheme.primary.copy(alpha = 0.40f)
+                            )
                         ) {
                             NavigationBar(
                                 containerColor = Color.Transparent,
                                 tonalElevation = 0.dp,
                                 modifier = Modifier.height(72.dp)
                             ) {
+                                val navItemColors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    indicatorColor = if (isDark) MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                                                    else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.90f),
+                                    unselectedIconColor = if (isDark) Color(0xFF94A3B8) else Color(0xFF475569),
+                                    unselectedTextColor = if (isDark) Color(0xFF94A3B8) else Color(0xFF334155)
+                                )
+
                                 // 1. الرئيسية (تجمع المبيعات والصندوق)
                                 val homeLabel = AppStrings.get("nav_home", lang)
                                 NavigationBarItem(
@@ -532,11 +636,7 @@ fun TicketAccountingApp(
                                         )
                                     },
                                     label = { Text(homeLabel, fontSize = 10.sp, fontWeight = if (currentScreen == AppScreen.HOME) FontWeight.Bold else FontWeight.Normal) },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                                    ),
+                                    colors = navItemColors,
                                     modifier = Modifier.testTag("nav_tab_home")
                                 )
 
@@ -552,11 +652,7 @@ fun TicketAccountingApp(
                                         )
                                     },
                                     label = { Text(modesLabel, fontSize = 9.5.sp, maxLines = 1, fontWeight = if (currentScreen == AppScreen.MANAGEMENT) FontWeight.Bold else FontWeight.Normal) },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                                    ),
+                                    colors = navItemColors,
                                     modifier = Modifier.testTag("nav_tab_modes")
                                 )
 
@@ -572,11 +668,7 @@ fun TicketAccountingApp(
                                         )
                                     },
                                     label = { Text(reportsLabel, fontSize = 9.5.sp, maxLines = 1, fontWeight = if (currentScreen == AppScreen.REPORTS) FontWeight.Bold else FontWeight.Normal) },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                                    ),
+                                    colors = navItemColors,
                                     modifier = Modifier.testTag("nav_tab_reports")
                                 )
 
@@ -592,11 +684,7 @@ fun TicketAccountingApp(
                                         )
                                     },
                                     label = { Text(settingsLabel, fontSize = 10.sp, fontWeight = if (currentScreen == AppScreen.SETTINGS) FontWeight.Bold else FontWeight.Normal) },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                                    ),
+                                    colors = navItemColors,
                                     modifier = Modifier.testTag("nav_tab_settings")
                                 )
                             }

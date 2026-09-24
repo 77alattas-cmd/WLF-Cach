@@ -84,9 +84,10 @@ fun DirectSalesScreen(
                     shape = RoundedCornerShape(16.dp),
                     elevation = 6.dp,
                     isDark = isDark,
-                    baseColor = MaterialTheme.colorScheme.surface
+                    gradientBrush = DesignSystem.cardGradient(isDark)
                 ),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(16.dp),
+            color = Color.Transparent
         ) {
             Column(
                 modifier = Modifier
@@ -402,6 +403,30 @@ fun DirectSalesScreen(
                     text = "قسم جديد",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal
+                )
+            }
+
+            // زر اختصار الانتقال للصندوق
+            FilledTonalButton(
+                onClick = { viewModel.navigateTo(AppScreen.CASH_BOX) },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.height(30.dp).testTag("btn_shortcut_to_cash_box")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AccountBalanceWallet,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "الصندوق 💼",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
 

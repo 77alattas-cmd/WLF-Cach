@@ -107,6 +107,7 @@ import com.example.ui.components.BalanceStatusBadge
 import com.example.ui.components.ExportReportDialog
 import com.example.ui.components.MiniBalanceStatusBadge
 import com.example.ui.model.*
+import com.example.ui.theme.DesignSystem
 import com.example.ui.theme.vibrant3d
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -204,9 +205,10 @@ fun ReportsScreen(
                         shape = RoundedCornerShape(18.dp),
                         elevation = 6.dp,
                         isDark = isDark,
-                        baseColor = MaterialTheme.colorScheme.surface
+                        gradientBrush = DesignSystem.cardGradient(isDark)
                     ),
-                shape = RoundedCornerShape(18.dp)
+                shape = RoundedCornerShape(18.dp),
+                color = Color.Transparent
             ) {
             Column(
                 modifier = Modifier
@@ -435,8 +437,12 @@ fun ReportsScreen(
 
         // 2. Interactive Segmented Tab Bar for Report Sections
         Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            shape = RoundedCornerShape(14.dp),
+            color = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface,
+            border = BorderStroke(
+                1.dp,
+                if (isDark) MaterialTheme.colorScheme.outline.copy(alpha = 0.35f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 4.dp)
@@ -444,7 +450,7 @@ fun ReportsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(3.dp),
+                    .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 reportTabs.forEachIndexed { index, title ->
@@ -453,12 +459,13 @@ fun ReportsScreen(
                         if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                         label = "tabBg"
                     )
-                    val tabText = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                    val tabText = if (isSelected) Color.White else (if (isDark) Color(0xFF94A3B8) else Color(0xFF334155))
 
                     Surface(
                         onClick = { selectedReportTab = index },
                         shape = RoundedCornerShape(10.dp),
                         color = tabBg,
+                        border = if (isSelected) null else BorderStroke(0.8.dp, if (isDark) Color.Transparent else Color(0xFFE2E8F0)),
                         modifier = Modifier
                             .weight(1f)
                             .height(34.dp)
@@ -468,7 +475,7 @@ fun ReportsScreen(
                             Text(
                                 text = title,
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                                     color = tabText,
                                     fontSize = 11.sp
                                 ),
